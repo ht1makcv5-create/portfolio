@@ -1,182 +1,10 @@
-import { useRef, useMemo, useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-
-/* ------------------------------------------------------------------ */
-/* Ghost mesh — procedural shape via LatheGeometry                    */
-/* ------------------------------------------------------------------ */
-function GhostMesh({ mouseX, mouseY }: { mouseX: number; mouseY: number }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const bodyRef = useRef<THREE.Mesh>(null);
-  const eyeLRef = useRef<THREE.Mesh>(null);
-  const eyeRRef = useRef<THREE.Mesh>(null);
-  const pupilLRef = useRef<THREE.Mesh>(null);
-  const pupilRRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
-
-  const clock = useRef(0);
-  const targetRotY = useRef(0);
-  const targetRotX = useRef(0);
-
-  const bodyPoints = useMemo(() => {
-    const pts: THREE.Vector2[] = [];
-    for (let i = 0; i <= 12; i++) {
-      const t = (i / 12) * Math.PI;
-      const x = Math.sin(t) * 1.0;
-      const y = Math.cos(t) * 1.1 + 0.4;
-      pts.push(new THREE.Vector2(x, y));
-    }
-    const tailCount = 5;
-    for (let i = 0; i <= tailCount * 8; i++) {
-      const t = i / (tailCount * 8);
-      const wave = Math.sin(t * tailCount * Math.PI * 2) * 0.18;
-      const x = (1.0 - t * 0.55) + wave;
-      const y = -1.1 - t * 0.55;
-      pts.push(new THREE.Vector2(Math.max(0.01, x), y));
-    }
-    return pts;
-  }, []);
-
-  const bodyGeo = useMemo(() => new THREE.LatheGeometry(bodyPoints, 64), [bodyPoints]);
-  const glowGeo = useMemo(() => new THREE.SphereGeometry(1.45, 32, 32), []);
-
-  const bodyMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#5b4aff'),
-    emissive: new THREE.Color('#3a2fd0'),
-    emissiveIntensity: 0.35,
-    transparent: true,
-    opacity: 0.82,
-    roughness: 0.25,
-    metalness: 0.05,
-    side: THREE.FrontSide,
-  }), []);
-
-  const glowMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#7b6cff'),
-    emissive: new THREE.Color('#4a3de8'),
-    emissiveIntensity: 0.2,
-    transparent: true,
-    opacity: 0.12,
-    roughness: 1,
-    metalness: 0,
-    side: THREE.BackSide,
-  }), []);
-
-  const eyeWhiteMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#ffffff'),
-    roughness: 0.3,
-    metalness: 0.0,
-    emissive: new THREE.Color('#ccccee'),
-    emissiveIntensity: 0.2,
-  }), []);
-
-  const pupilMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#1a1230'),
-    roughness: 0.6,
-    metalness: 0,
-    emissive: new THREE.Color('#2a1a5e'),
-    emissiveIntensity: 0.1,
-  }), []);
-
-  useFrame((_, delta) => {
-    clock.current += delta;
-    const t = clock.current;
-    if (!groupRef.current) return;
-
-    targetRotY.current += (mouseX * 0.28 - targetRotY.current) * 0.04;
-    targetRotX.current += (-mouseY * 0.18 - targetRotX.current) * 0.04;
-    groupRef.current.rotation.y = targetRotY.current;
-    groupRef.current.rotation.x = targetRotX.current;
-    groupRef.current.position.y = Math.sin(t * 0.7) * 0.18 + Math.sin(t * 1.3 + 1) * 0.07;
-
-    if (bodyRef.current) {
-      bodyRef.current.rotation.z = Math.sin(t * 0.9) * 0.022;
-    }
-
-    const eyeShiftX = mouseX * 0.06;
-    const eyeShiftY = -mouseY * 0.04;
-
-    if (pupilLRef.current) {
-      pupilLRef.current.position.x = -0.32 + eyeShiftX;
-      pupilLRef.current.position.y = 0.58 + eyeShiftY;
-      pupilLRef.current.position.z = 0.95;
-    }
-    if (pupilRRef.current) {
-      pupilRRef.current.position.x = 0.32 + eyeShiftX;
-      pupilRRef.current.position.y = 0.58 + eyeShiftY;
-      pupilRRef.current.position.z = 0.95;
-    }
-
-    if (glowRef.current) {
-      const scale = 1 + Math.sin(t * 1.1) * 0.04;
-      glowRef.current.scale.setScalar(scale);
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, 0, 0]}>
-      <mesh ref={glowRef} geometry={glowGeo} material={glowMat} />
-      <mesh ref={bodyRef} geometry={bodyGeo} material={bodyMat} />
-
-      <mesh ref={eyeLRef} position={[-0.32, 0.58, 0.9]}>
-        <sphereGeometry args={[0.22, 24, 24]} />
-        <primitive object={eyeWhiteMat} attach="material" />
-      </mesh>
-      <mesh ref={eyeRRef} position={[0.32, 0.58, 0.9]}>
-        <sphereGeometry args={[0.22, 24, 24]} />
-        <primitive object={eyeWhiteMat} attach="material" />
-      </mesh>
-
-      <mesh ref={pupilLRef} position={[-0.32, 0.58, 0.95]}>
-        <sphereGeometry args={[0.13, 20, 20]} />
-        <primitive object={pupilMat} attach="material" />
-      </mesh>
-      <mesh ref={pupilRRef} position={[0.32, 0.58, 0.95]}>
-        <sphereGeometry args={[0.13, 20, 20]} />
-        <primitive object={pupilMat} attach="material" />
-      </mesh>
-
-      <pointLight color="#6b5dff" intensity={2.5} distance={4} position={[0, 0.2, 0]} />
-      <pointLight color="#a090ff" intensity={1.2} distance={3.5} position={[0, 2, 1]} />
-    </group>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Scene wrapper                                                       */
-/* ------------------------------------------------------------------ */
-function SceneContent({ mouseX, mouseY }: { mouseX: number; mouseY: number }) {
-  return (
-    <>
-      <ambientLight color="#1a0f3a" intensity={0.6} />
-      <directionalLight color="#8878ff" intensity={1.4} position={[3, 4, 3]} />
-      <directionalLight color="#3020a0" intensity={0.6} position={[-3, 1, 2]} />
-      <GhostMesh mouseX={mouseX} mouseY={mouseY} />
-    </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Exported canvas component                                          */
-/* ------------------------------------------------------------------ */
-function hasWebGL(): boolean {
-  try {
-    const canvas = document.createElement('canvas');
-    return !!(
-      window.WebGLRenderingContext &&
-      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
-    );
-  } catch {
-    return false;
-  }
-}
+import { useEffect, useRef, useState } from 'react';
 
 export default function GhostScene() {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
-  const [webgl] = useState(() => hasWebGL());
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!webgl) return;
     const handle = (e: MouseEvent) => {
       const nx = (e.clientX / window.innerWidth) * 2 - 1;
       const ny = (e.clientY / window.innerHeight) * 2 - 1;
@@ -184,18 +12,172 @@ export default function GhostScene() {
     };
     window.addEventListener('mousemove', handle, { passive: true });
     return () => window.removeEventListener('mousemove', handle);
-  }, [webgl]);
+  }, []);
 
-  if (!webgl) return null;
+  // pupil offset — subtle follow
+  const pupilX = mouse.x * 5;
+  const pupilY = mouse.y * 4;
 
   return (
-    <Canvas
-      camera={{ position: [0, 0, 4.5], fov: 42 }}
-      gl={{ antialias: true, alpha: true }}
-      dpr={[1, 2]}
-      style={{ background: 'transparent' }}
+    <div
+      ref={containerRef}
+      className="relative h-full w-full flex items-end justify-center overflow-visible"
+      aria-hidden
     >
-      <SceneContent mouseX={mouse.x} mouseY={mouse.y} />
-    </Canvas>
+      {/* Ambient ground glow */}
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full blur-3xl"
+        style={{
+          width: '75%',
+          height: '18%',
+          background: 'radial-gradient(ellipse, rgba(90,72,255,0.28) 0%, transparent 70%)',
+          animation: 'ghostGlow 4s ease-in-out infinite',
+        }}
+      />
+
+      {/* Ghost SVG wrapper — floats up and down */}
+      <div
+        style={{
+          animation: 'ghostFloat 4.2s ease-in-out infinite',
+          transformOrigin: 'center bottom',
+          width: '82%',
+          maxWidth: 520,
+        }}
+      >
+        <svg
+          viewBox="0 0 200 260"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ overflow: 'visible', filter: 'drop-shadow(0 0 32px rgba(90,72,255,0.45))' }}
+        >
+          <defs>
+            {/* Body gradient — purple glow */}
+            <radialGradient id="bodyGrad" cx="45%" cy="35%" r="62%">
+              <stop offset="0%" stopColor="#8b7fff" />
+              <stop offset="55%" stopColor="#5b4aff" />
+              <stop offset="100%" stopColor="#2c1fa8" />
+            </radialGradient>
+
+            {/* Outer glow layer */}
+            <radialGradient id="glowGrad" cx="50%" cy="45%" r="55%">
+              <stop offset="0%" stopColor="#7b6cff" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#5b4aff" stopOpacity="0" />
+            </radialGradient>
+
+            {/* Inner highlight */}
+            <radialGradient id="highlightGrad" cx="38%" cy="28%" r="35%">
+              <stop offset="0%" stopColor="#ccc8ff" stopOpacity="0.55" />
+              <stop offset="100%" stopColor="#ccc8ff" stopOpacity="0" />
+            </radialGradient>
+
+            {/* Eye whites */}
+            <radialGradient id="eyeGrad" cx="38%" cy="32%" r="60%">
+              <stop offset="0%" stopColor="#ffffff" />
+              <stop offset="100%" stopColor="#d8d4ff" />
+            </radialGradient>
+
+            <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2.5" />
+            </filter>
+          </defs>
+
+          {/* Outer glow blob */}
+          <ellipse cx="100" cy="108" rx="82" ry="85" fill="url(#glowGrad)" />
+
+          {/* Ghost body — dome + wavy skirt */}
+          <path
+            d="
+              M 100 18
+              C 56 18, 22 52, 22 96
+              L 22 190
+              Q 33 178, 44 190
+              Q 55 202, 66 190
+              Q 77 178, 88 190
+              Q 99 202, 110 190
+              Q 121 178, 132 190
+              Q 143 202, 154 190
+              Q 165 178, 176 190
+              L 178 96
+              C 178 52, 144 18, 100 18
+              Z
+            "
+            fill="url(#bodyGrad)"
+            style={{ animation: 'ghostWobble 3.8s ease-in-out infinite' }}
+          />
+
+          {/* Highlight sheen */}
+          <path
+            d="
+              M 100 18
+              C 56 18, 22 52, 22 96
+              L 22 190
+              Q 33 178, 44 190
+              Q 55 202, 66 190
+              Q 77 178, 88 190
+              Q 99 202, 110 190
+              Q 121 178, 132 190
+              Q 143 202, 154 190
+              Q 165 178, 176 190
+              L 178 96
+              C 178 52, 144 18, 100 18
+              Z
+            "
+            fill="url(#highlightGrad)"
+          />
+
+          {/* Left eye white */}
+          <ellipse cx="76" cy="102" rx="17" ry="19" fill="url(#eyeGrad)" />
+          {/* Right eye white */}
+          <ellipse cx="124" cy="102" rx="17" ry="19" fill="url(#eyeGrad)" />
+
+          {/* Left pupil — follows mouse */}
+          <ellipse
+            cx={76 + pupilX}
+            cy={102 + pupilY}
+            rx="9"
+            ry="10"
+            fill="#1a1230"
+            style={{ transition: 'cx 0.12s ease-out, cy 0.12s ease-out' }}
+          />
+          {/* Right pupil */}
+          <ellipse
+            cx={124 + pupilX}
+            cy={102 + pupilY}
+            rx="9"
+            ry="10"
+            fill="#1a1230"
+            style={{ transition: 'cx 0.12s ease-out, cy 0.12s ease-out' }}
+          />
+
+          {/* Eye glints */}
+          <circle cx={72 + pupilX * 0.4} cy={97 + pupilY * 0.4} r="3.2" fill="white" opacity="0.8" />
+          <circle cx={120 + pupilX * 0.4} cy={97 + pupilY * 0.4} r="3.2" fill="white" opacity="0.8" />
+
+          {/* Small mouth / expression */}
+          <ellipse cx="100" cy="142" rx="6" ry="4" fill="#1a1230" opacity="0.5" />
+        </svg>
+      </div>
+
+      {/* CSS keyframes injected via style tag */}
+      <style>{`
+        @keyframes ghostFloat {
+          0%   { transform: translateY(0px) rotate(0deg); }
+          25%  { transform: translateY(-18px) rotate(0.8deg); }
+          50%  { transform: translateY(-28px) rotate(-0.5deg); }
+          75%  { transform: translateY(-14px) rotate(0.4deg); }
+          100% { transform: translateY(0px) rotate(0deg); }
+        }
+        @keyframes ghostWobble {
+          0%   { transform: scaleX(1) scaleY(1); }
+          30%  { transform: scaleX(1.015) scaleY(0.992); }
+          60%  { transform: scaleX(0.988) scaleY(1.008); }
+          100% { transform: scaleX(1) scaleY(1); }
+        }
+        @keyframes ghostGlow {
+          0%   { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+          50%  { opacity: 1;   transform: translateX(-50%) scaleX(0.82); }
+          100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+        }
+      `}</style>
+    </div>
   );
 }
