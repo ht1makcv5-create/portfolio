@@ -608,11 +608,67 @@ function ProjectCard({ t, onOpen }: { t: typeof T['en']; onOpen: () => void }) {
   );
 }
 
-function ProjectsPage({ t, onOpenCase }: { t: typeof T['en']; onOpenCase: () => void }) {
+function BotCard({ num, handle, tagUk, tagEn, titleUk, titleEn, descUk, descEn, lang }: {
+  num: string; handle: string; tagUk: string; tagEn: string;
+  titleUk: string; titleEn: string; descUk: string; descEn: string; lang: Lang;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const isUk = lang === 'uk';
+  return (
+    <a
+      href={`https://t.me/${handle.replace('@', '')}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative block border-b border-[hsl(var(--border))] py-8 md:py-10"
+    >
+      <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-14">
+        <div className="flex items-start gap-5 md:w-3/5">
+          <span
+            className="shrink-0 font-serif italic leading-none text-[hsl(var(--muted-foreground)_/_0.25)] transition-colors duration-500 group-hover:text-[hsl(var(--primary)_/_0.5)]"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)' }}
+          >{num}</span>
+          <div className="pt-1">
+            <span className="mb-2 inline-block font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--primary)_/_0.7)]">
+              {isUk ? tagUk : tagEn}
+            </span>
+            <h3 className="font-serif text-2xl italic text-[hsl(var(--foreground))] md:text-3xl">
+              {isUk ? titleUk : titleEn}
+            </h3>
+            <p className="mt-3 max-w-md font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+              {isUk ? descUk : descEn}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 md:w-2/5 md:justify-end md:pt-2">
+          <span className="font-sans text-xs tracking-[0.15em] text-[hsl(var(--muted-foreground)_/_0.5)] transition-colors group-hover:text-[hsl(var(--muted-foreground))]">
+            {handle}
+          </span>
+          <motion.span
+            animate={{ x: hovered ? 5 : 0 }}
+            transition={{ duration: 0.4 }}
+            className="text-[hsl(var(--primary))]"
+          >→</motion.span>
+        </div>
+      </div>
+      <motion.span
+        aria-hidden
+        className="absolute -bottom-px left-0 h-px bg-[hsl(var(--primary))]"
+        initial={{ width: '0%' }}
+        animate={{ width: hovered ? '100%' : '0%' }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      />
+    </a>
+  );
+}
+
+function ProjectsPage({ t, lang, onOpenCase }: { t: typeof T['en']; lang: Lang; onOpenCase: () => void }) {
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
-        {/* Section label */}
+
+        {/* — Sites section label — */}
         <motion.div
           initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
@@ -632,17 +688,56 @@ function ProjectsPage({ t, onOpenCase }: { t: typeof T['en']; onOpenCase: () => 
           <ProjectCard t={t} onOpen={onOpenCase} />
         </motion.div>
 
+        {/* — Bots section label — */}
+        <motion.div
+          initial={{ opacity: 0, x: -24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-10 mt-20 flex items-baseline gap-4 md:mt-28"
+        >
+          <span className="font-sans text-xs tracking-[0.3em] text-[hsl(var(--primary))]">02</span>
+          <span className="font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+            {lang === 'uk' ? 'Боти' : 'Bots'}
+          </span>
+          <span className="h-px flex-1 bg-[hsl(var(--border))]" />
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 flex items-center justify-between border-b border-[hsl(var(--border))] py-8 opacity-40 md:py-10"
+          transition={{ duration: 0.7, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="flex items-center gap-6">
-            <span className="font-serif italic leading-none text-[hsl(var(--muted-foreground)_/_0.35)]" style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)' }}>02</span>
-            <span className="font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">{t.moreWork}</span>
-          </div>
+          <BotCard
+            num="01"
+            handle="@boohxFit_bot"
+            tagUk="особистий проєкт · тренування"
+            tagEn="personal project · fitness"
+            titleUk="boohxFit — тренувальний бот"
+            titleEn="boohxFit — fitness bot"
+            descUk="Бот для особистих тренувань, зроблений для себе. Веде облік підходів, ваги та прогресу — без зайвих застосунків. Просто Telegram і залізо."
+            descEn="A personal training bot built for my own use. Tracks sets, weight, and progress — no extra apps needed. Just Telegram and iron."
+            lang={lang}
+          />
         </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <BotCard
+            num="02"
+            handle="@boohx_bot"
+            tagUk="особистий проєкт · утиліта"
+            tagEn="personal project · utility"
+            titleUk="boohx — пошук юзернеймів"
+            titleEn="boohx — username finder"
+            descUk="Перевіряє, чи вільний юзернейм у Telegram. Написав для себе — витрачав забагато часу на ручний пошук гарних нікнеймів для клієнтів і проєктів."
+            descEn="Checks whether a Telegram username is available. Built for personal use — I was spending too much time manually hunting clean handles for clients and projects."
+            lang={lang}
+          />
+        </motion.div>
+
       </div>
     </div>
   );
@@ -917,6 +1012,223 @@ function AboutPage({ t, onContact }: { t: typeof T['en']; onContact: () => void 
 /* ------------------------------------------------------------------ */
 /* SERVICES page                                                       */
 /* ------------------------------------------------------------------ */
+function BotOrderForm({ lang }: { lang: Lang }) {
+  const isUk = lang === 'uk';
+  const [open, setOpen] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({
+    name: '', telegram: '', description: '', botType: '', deadline: '',
+  });
+  const [features, setFeatures] = useState<string[]>([]);
+
+  const featureOptions = isUk
+    ? ['Каталог / меню', 'Оплата онлайн', 'Адмін-панель', 'Розсилка', 'Інтеграція з CRM', 'Мультимова']
+    : ['Catalog / menu', 'Online payments', 'Admin panel', 'Broadcasts', 'CRM integration', 'Multi-language'];
+
+  const botTypes = isUk
+    ? ['Інтернет-магазин', 'Запис на послуги', 'Інформаційний / FAQ', 'Розсилка / канал', 'Свій варіант']
+    : ['Online store', 'Booking / appointments', 'Info / FAQ', 'Broadcast / channel', 'Custom'];
+
+  const deadlines = isUk
+    ? ['Без поспіху', 'До місяця', '2–3 тижні', 'Терміново']
+    : ['No rush', 'Within a month', '2–3 weeks', 'ASAP'];
+
+  const toggleFeature = (f: string) =>
+    setFeatures(prev => prev.includes(f) ? prev.filter(x => x !== f) : [...prev, f]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const lines = [
+      `🤖 ${isUk ? 'Замовлення бота' : 'Bot order'}`,
+      form.name ? `👤 ${isUk ? 'Імʼя' : 'Name'}: ${form.name}` : '',
+      `📱 Telegram: ${form.telegram}`,
+      form.botType ? `🏷 ${isUk ? 'Тип' : 'Type'}: ${form.botType}` : '',
+      `📝 ${isUk ? 'Опис' : 'Description'}: ${form.description}`,
+      features.length ? `⚙️ ${isUk ? 'Функції' : 'Features'}: ${features.join(', ')}` : '',
+      form.deadline ? `⏱ ${isUk ? 'Дедлайн' : 'Deadline'}: ${form.deadline}` : '',
+    ].filter(Boolean).join('\n');
+    window.open(`https://t.me/sefice?text=${encodeURIComponent(lines)}`, '_blank');
+    setSent(true);
+  };
+
+  const isValid = form.telegram.trim().length > 1 && form.description.trim().length > 5;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: 0.7 }}
+      className="mt-16 border border-[hsl(var(--border))]"
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="group flex w-full items-center justify-between px-8 py-6 text-left"
+      >
+        <div>
+          <p className="mb-1 font-sans text-[10px] uppercase tracking-[0.35em] text-[hsl(var(--primary)_/_0.7)]">
+            {isUk ? 'Новий напрям' : 'New direction'}
+          </p>
+          <h3 className="font-serif text-2xl italic text-[hsl(var(--foreground))] md:text-3xl">
+            {isUk ? 'Замовити Telegram-бота' : 'Order a Telegram bot'}
+          </h3>
+        </div>
+        <motion.span
+          animate={{ rotate: open ? 45 : 0 }}
+          transition={{ duration: 0.3 }}
+          className="shrink-0 text-2xl leading-none text-[hsl(var(--primary))]"
+        >+</motion.span>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            {sent ? (
+              <div className="flex flex-col items-center gap-4 px-8 pb-10 pt-4 text-center">
+                <span className="text-4xl">🤖</span>
+                <p className="font-serif text-xl italic text-[hsl(var(--foreground))]">
+                  {isUk ? 'Відкрили Telegram — відправ повідомлення!' : 'Telegram opened — just hit send!'}
+                </p>
+                <button type="button" onClick={() => { setSent(false); setForm({ name: '', telegram: '', description: '', botType: '', deadline: '' }); setFeatures([]); }}
+                  className="mt-2 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] underline">
+                  {isUk ? 'Нова заявка' : 'New request'}
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="grid gap-5 px-8 pb-10 pt-2 md:grid-cols-2">
+
+                {/* Name */}
+                <div className="flex flex-col gap-2">
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+                    {isUk ? "Імʼя" : "Name"} <span className="opacity-40">({isUk ? 'необовʼязково' : 'optional'})</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    placeholder={isUk ? 'Як до вас звертатись' : 'What to call you'}
+                    className="border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                  />
+                </div>
+
+                {/* Telegram */}
+                <div className="flex flex-col gap-2">
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+                    Telegram <span className="text-[hsl(var(--primary))]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.telegram}
+                    onChange={e => setForm(f => ({ ...f, telegram: e.target.value }))}
+                    placeholder="@username"
+                    className="border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                  />
+                </div>
+
+                {/* Bot type */}
+                <div className="flex flex-col gap-2">
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+                    {isUk ? 'Тип бота' : 'Bot type'}
+                  </label>
+                  <select
+                    value={form.botType}
+                    onChange={e => setForm(f => ({ ...f, botType: e.target.value }))}
+                    className="border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                  >
+                    <option value="">{isUk ? 'Оберіть...' : 'Select...'}</option>
+                    {botTypes.map(b => <option key={b} value={b}>{b}</option>)}
+                  </select>
+                </div>
+
+                {/* Deadline */}
+                <div className="flex flex-col gap-2">
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+                    {isUk ? 'Дедлайн' : 'Deadline'}
+                  </label>
+                  <select
+                    value={form.deadline}
+                    onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))}
+                    className="border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                  >
+                    <option value="">{isUk ? 'Не важливо' : 'Not important'}</option>
+                    {deadlines.map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+
+                {/* Description */}
+                <div className="flex flex-col gap-2 md:col-span-2">
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+                    {isUk ? 'Опис проєкту' : 'Project description'} <span className="text-[hsl(var(--primary))]">*</span>
+                  </label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={form.description}
+                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                    placeholder={isUk
+                      ? 'Розкажіть про ваш бізнес, чого хочете від бота, які задачі він має вирішувати...'
+                      : 'Tell me about your business, what you want the bot to do, what problems it should solve...'}
+                    className="resize-none border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                  />
+                </div>
+
+                {/* Features checkboxes */}
+                <div className="flex flex-col gap-3 md:col-span-2">
+                  <label className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+                    {isUk ? 'Потрібні функції' : 'Desired features'}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {featureOptions.map(f => (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => toggleFeature(f)}
+                        className={`border px-3 py-1.5 font-sans text-xs transition-colors ${
+                          features.includes(f)
+                            ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.1)] text-[hsl(var(--foreground))]'
+                            : 'border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] hover:border-[hsl(var(--primary)_/_0.5)]'
+                        }`}
+                      >{f}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price note + submit */}
+                <div className="flex flex-col gap-4 md:col-span-2 md:flex-row md:items-center md:justify-between">
+                  <p className="font-sans text-xs text-[hsl(var(--muted-foreground)_/_0.6)] italic">
+                    {isUk ? '💬 Ціну обговоримо в особистих — після того як зрозуміємо обʼєм.' : '💬 Price discussed in DMs — after we scope the work together.'}
+                  </p>
+                  <motion.button
+                    type="submit"
+                    disabled={!isValid}
+                    whileHover={isValid ? { scale: 1.03 } : {}}
+                    whileTap={isValid ? { scale: 0.97 } : {}}
+                    className={`px-8 py-4 font-sans text-xs uppercase tracking-[0.3em] transition-colors ${
+                      isValid
+                        ? 'bg-[hsl(var(--primary))] text-[hsl(var(--background))] cursor-pointer'
+                        : 'border border-[hsl(var(--border))] text-[hsl(var(--muted-foreground)_/_0.4)] cursor-not-allowed'
+                    }`}
+                  >
+                    {isUk ? 'Відправити →' : 'Send →'}
+                  </motion.button>
+                </div>
+
+              </form>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
 function ServicesPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
   const [openService, setOpenService] = useState<string | null>(null);
 
@@ -985,6 +1297,8 @@ function ServicesPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
             );
           })}
         </div>
+
+        <BotOrderForm lang={lang} />
 
         {/* CTA block */}
         <motion.div
@@ -1189,7 +1503,7 @@ export default function Portfolio() {
         )}
         {currentPage === 'projects' && (
           <PageWrap pageKey="projects">
-            <ProjectsPage t={t} onOpenCase={() => navigate('case-mzshop')} />
+            <ProjectsPage t={t} lang={savedLang} onOpenCase={() => navigate('case-mzshop')} />
           </PageWrap>
         )}
         {currentPage === 'case-mzshop' && (
