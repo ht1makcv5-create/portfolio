@@ -17,7 +17,7 @@ class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 type Lang = 'en' | 'uk';
-type Page = 'home' | 'projects' | 'about' | 'services' | 'contact';
+type Page = 'home' | 'projects' | 'about' | 'services' | 'contact' | 'case-mzshop';
 
 /* ------------------------------------------------------------------ */
 /* Translations                                                        */
@@ -540,16 +540,15 @@ function HomePage({ t }: { t: typeof T['en'] }) {
 /* ------------------------------------------------------------------ */
 /* PROJECTS page                                                       */
 /* ------------------------------------------------------------------ */
-function ProjectCard({ t }: { t: typeof T['en'] }) {
+function ProjectCard({ t, onOpen }: { t: typeof T['en']; onOpen: () => void }) {
   const [hovered, setHovered] = useState(false);
   return (
-    <a
-      href="https://mzshop.xyz"
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      type="button"
+      onClick={onOpen}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative block border-y border-[hsl(var(--border))] py-10 md:py-14"
+      className="group relative block w-full border-y border-[hsl(var(--border))] py-10 text-left md:py-14"
     >
       <div className="flex flex-col gap-8 md:flex-row md:items-center md:gap-14">
         <div className="flex items-start gap-6 md:w-1/2">
@@ -592,7 +591,7 @@ function ProjectCard({ t }: { t: typeof T['en'] }) {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[hsl(var(--background)_/_0.5)] via-transparent to-transparent" />
           <div className="absolute bottom-4 right-4">
             <span className="relative flex items-center gap-2 bg-[hsl(var(--background)_/_0.55)] px-3 py-1.5 backdrop-blur-sm font-sans text-xs text-[hsl(var(--foreground))] uppercase tracking-[0.3em]">
-              View
+              Case study
               <motion.span animate={{ x: hovered ? 5 : 0 }} transition={{ duration: 0.4 }}>→</motion.span>
             </span>
           </div>
@@ -605,11 +604,11 @@ function ProjectCard({ t }: { t: typeof T['en'] }) {
         animate={{ width: hovered ? '100%' : '0%' }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       />
-    </a>
+    </button>
   );
 }
 
-function ProjectsPage({ t }: { t: typeof T['en'] }) {
+function ProjectsPage({ t, onOpenCase }: { t: typeof T['en']; onOpenCase: () => void }) {
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
@@ -630,7 +629,7 @@ function ProjectsPage({ t }: { t: typeof T['en'] }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         >
-          <ProjectCard t={t} />
+          <ProjectCard t={t} onOpen={onOpenCase} />
         </motion.div>
 
         <motion.div
@@ -644,6 +643,171 @@ function ProjectsPage({ t }: { t: typeof T['en'] }) {
             <span className="font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">{t.moreWork}</span>
           </div>
         </motion.div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* CASE STUDY page — mzshop.xyz / Галина Коцюба                       */
+/* ------------------------------------------------------------------ */
+function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
+  const isUk = lang === 'uk';
+  return (
+    <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
+      <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-24 md:pt-36 md:pb-32">
+
+        {/* Back link */}
+        <motion.button
+          type="button"
+          onClick={onBack}
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-14 flex items-center gap-2 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))]"
+        >
+          ← {isUk ? 'Назад до проєктів' : 'Back to projects'}
+        </motion.button>
+
+        {/* Tags */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.05 }}
+          className="mb-8 flex flex-wrap gap-2"
+        >
+          {['E-COMMERCE', 'UI / UX', 'FRONT-END'].map(tag => (
+            <span
+              key={tag}
+              className="border border-[hsl(var(--border))] px-3 py-1 font-sans text-[10px] tracking-[0.25em] text-[hsl(var(--muted-foreground))]"
+            >
+              {tag}
+            </span>
+          ))}
+        </motion.div>
+
+        {/* Hero name */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-6"
+        >
+          <h1 className="leading-none" style={{ fontSize: 'clamp(2.8rem, 9vw, 7rem)' }}>
+            <span className="font-sans font-bold text-[hsl(var(--foreground))]">
+              {isUk ? 'Галина ' : 'Galyna '}
+            </span>
+            <span className="font-serif italic text-[hsl(var(--primary))]">
+              {isUk ? 'Коцюба' : 'Kotsiuba'}
+            </span>
+          </h1>
+        </motion.div>
+
+        {/* Hero subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.18 }}
+          className="mb-16 max-w-2xl font-serif italic text-lg leading-relaxed text-[hsl(var(--muted-foreground))] md:text-xl"
+        >
+          {isUk
+            ? 'Цифровий магазин авторських сережок — для тієї, чия робота потребує не просто вітрини, а власного простору з характером.'
+            : 'A digital storefront for handcrafted earrings — built for a maker whose work deserves more than a marketplace listing.'}
+        </motion.p>
+
+        {/* Divider */}
+        <div className="mb-16 h-px w-full bg-[hsl(var(--border))]" />
+
+        {/* Two-column body */}
+        <div className="flex flex-col gap-16 md:flex-row md:gap-20">
+
+          {/* Left — narrative */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.22 }}
+            className="md:w-3/5"
+          >
+            {isUk ? (
+              <>
+                <p className="mb-6 font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  Галина Коцюба — майстриня авторських прикрас з Києва. Вона ліпить, плавить і збирає кожну пару сережок вручну — з полімерної глини, смоли та металу. За три роки роботи у неї зібралася лояльна аудиторія в Instagram, але не було єдиного місця, де можна показати весь асортимент і прийняти замовлення без зайвих повідомлень.
+                </p>
+                <p className="mb-6 font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  На момент звернення до нас її <strong className="text-[hsl(var(--foreground))]">цифрова присутність</strong> зводилася до Instagram-профілю та папки на Etsy. Асортимент — великий, контексту — нуль.
+                </p>
+                <p className="mb-6 font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  Завдання, яке ми сформулювали разом: побудувати не просто «інтернет-магазин», а простір, де кожна прикраса читається як окрема робота — з описом матеріалів, фотографіями на моделі та кнопкою замовлення без зайвих кроків.
+                </p>
+                <p className="font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  Результат — <a href="https://mzshop.xyz" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 transition-colors hover:text-[hsl(var(--primary))]">mzshop.xyz</a>: темна золота естетика, каталог із фільтрами, кошик та форма замовлення через Telegram. Сайт запущений у 2026, і вже в перший місяць приніс Галині перші онлайн-продажі без посередників.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mb-6 font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  Galyna Kotsiuba is a Kyiv-based jewelry maker. She hand-crafts each pair of earrings from polymer clay, resin, and metal — slowly, deliberately, one piece at a time. Over three years she built a loyal Instagram audience, but had no single place to show her full range and take orders without a flood of DMs.
+                </p>
+                <p className="mb-6 font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  When she came to us, her <strong className="text-[hsl(var(--foreground))]">digital presence</strong> was an Instagram profile and an Etsy folder. The work was plentiful; the context was zero.
+                </p>
+                <p className="mb-6 font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  The brief we shaped together: not just a shop, but a space where each piece reads like a standalone work — material notes, on-model photography, and an order flow with no unnecessary steps.
+                </p>
+                <p className="font-sans text-[15px] leading-[1.85] text-[hsl(var(--foreground)_/_0.85)]">
+                  The result is <a href="https://mzshop.xyz" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 transition-colors hover:text-[hsl(var(--primary))]">mzshop.xyz</a>: dark-gold aesthetic, filtered catalog, cart, and Telegram order flow. Launched in 2026 — and within the first month, Galyna received her first direct online sales without a single marketplace cut.
+                </p>
+              </>
+            )}
+          </motion.div>
+
+          {/* Right — context sidebar */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="md:w-2/5"
+          >
+            {/* Client badge */}
+            <div className="mb-8 inline-flex flex-col border border-[hsl(var(--border))] px-5 py-4">
+              <span className="mb-1 font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+                {isUk ? 'Інтернет-продавець' : 'Online seller'}
+              </span>
+              <span className="font-serif text-2xl italic text-[hsl(var(--foreground))]">
+                {isUk ? 'Галина' : 'Galyna'}
+              </span>
+            </div>
+
+            <p className="font-sans text-sm leading-[1.9] text-[hsl(var(--muted-foreground))]">
+              {isUk
+                ? 'Галина Коцюба — продавець авторських сережок з Києва. Працює сама: від ескізу до упаковки. Її клієнтки — жінки, які цінують речі зі змістом і не хочуть купувати «як у всіх». Сайт став для неї першим кроком від ремесла до бізнесу.'
+                : 'Galyna Kotsiuba — a solo jewelry maker from Kyiv. She handles everything: sketch to shipping. Her customers are women who value intentional objects and refuse to buy "what everyone else has." The site was her first step from craft to business.'}
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Bottom credits bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="mt-20 border-t border-[hsl(var(--border))] pt-10 md:mt-28"
+        >
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            {[
+              { label: isUk ? 'Клієнт' : 'Client', value: isUk ? 'Галина Коцюба' : 'Galyna Kotsiuba' },
+              { label: isUk ? 'Локація' : 'Location', value: isUk ? 'Київ — Україна' : 'Kyiv — Ukraine' },
+              { label: isUk ? 'Рік' : 'Year', value: '2026' },
+              { label: isUk ? 'Роль' : 'Role', value: 'Strategy · UX · UI · Frontend' },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <p className="mb-2 font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground)_/_0.55)]">{label}</p>
+                <p className="font-sans text-sm text-[hsl(var(--foreground)_/_0.8)]">{value}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
       </div>
     </div>
   );
@@ -1025,7 +1189,12 @@ export default function Portfolio() {
         )}
         {currentPage === 'projects' && (
           <PageWrap pageKey="projects">
-            <ProjectsPage t={t} />
+            <ProjectsPage t={t} onOpenCase={() => navigate('case-mzshop')} />
+          </PageWrap>
+        )}
+        {currentPage === 'case-mzshop' && (
+          <PageWrap pageKey="case-mzshop">
+            <CaseMzshopPage lang={savedLang} onBack={() => navigate('projects')} />
           </PageWrap>
         )}
         {currentPage === 'about' && (
