@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Yana Creative Studio"
+description = "A Ukrainian creative studio portfolio with a request form that saves orders and sends notifications to the administrator's Telegram bot without redirecting visitors away from the site."
+version = "1.0.0"
+id = "artifacts/portfolio-site"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24826
+
+[services.development]
+run = "pnpm --filter @workspace/portfolio-site run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/portfolio-site", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/portfolio-site/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24826"
+BASE_PATH = "/"

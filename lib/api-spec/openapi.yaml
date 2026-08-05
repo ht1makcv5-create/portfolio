@@ -10,6 +10,12 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: requests
+    description: Public request intake and protected request management
+  - name: admin
+    description: Protected admin session and dashboard operations
+  - name: telegram
+    description: Telegram bot operations
 paths:
   /healthz:
     get:
@@ -24,6 +30,148 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /requests:
+    get:
+      operationId: listRequests
+      tags: [requests]
+      summary: List submitted requests
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [new, in_progress, completed, archived]
+        - name: kind
+          in: query
+          schema:
+            type: string
+            enum: [contact, order]
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Submitted requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+        "401":
+          description: Admin session required
+    post:
+      operationId: createRequest
+      tags: [requests]
+      summary: Submit a contact request or order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestInput"
+      responses:
+        "201":
+          description: Request created and sent to Telegram
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        "400":
+          description: Invalid request
+  /requests/{id}:
+    patch:
+      operationId: updateRequest
+      tags: [requests]
+      summary: Update request status or notes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestUpdate"
+      responses:
+        "200":
+          description: Updated request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        "401":
+          description: Admin session required
+        "404":
+          description: Request not found
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [admin]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+        "401":
+          description: Admin session required
+  /admin/session:
+    get:
+      operationId: getAdminSession
+      tags: [admin]
+      summary: Get current admin session
+      responses:
+        "200":
+          description: Current session state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+    post:
+      operationId: createAdminSession
+      tags: [admin]
+      summary: Verify Telegram Login Widget data and create admin session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TelegramLogin"
+      responses:
+        "200":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSession"
+        "401":
+          description: Telegram account is not authorized
+    delete:
+      operationId: deleteAdminSession
+      tags: [admin]
+      summary: End current admin session
+      responses:
+        "204":
+          description: Session ended
+  /telegram/bot:
+    get:
+      operationId: getTelegramBot
+      tags: [telegram]
+      summary: Get public bot username for Telegram Login Widget
+      responses:
+        "200":
+          description: Bot identity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelegramBot"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +181,111 @@ components:
           type: string
       required:
         - status
+    Request:
+      type: object
+      required: [id, kind, name, contact, message, status, createdAt]
+      properties:
+        id:
+          type: number
+        kind:
+          type: string
+          enum: [contact, order]
+        name:
+          type: string
+        contact:
+          type: string
+        message:
+          type: string
+        service:
+          type: ["string", "null"]
+        budget:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [new, in_progress, completed, archived]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+    RequestInput:
+      type: object
+      required: [kind, name, contact, message]
+      properties:
+        kind:
+          type: string
+          enum: [contact, order]
+        name:
+          type: string
+          minLength: 2
+        contact:
+          type: string
+          minLength: 3
+        message:
+          type: string
+          minLength: 5
+        service:
+          type: string
+        budget:
+          type: string
+    RequestUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, in_progress, completed, archived]
+        notes:
+          type: string
+    Dashboard:
+      type: object
+      required: [total, newCount, orderCount, completedCount, recent]
+      properties:
+        total:
+          type: number
+        newCount:
+          type: number
+        orderCount:
+          type: number
+        completedCount:
+          type: number
+        recent:
+          type: array
+          items:
+            $ref: "#/components/schemas/Request"
+    TelegramLogin:
+      type: object
+      required: [id, first_name, auth_date, hash]
+      properties:
+        id:
+          type: number
+        first_name:
+          type: string
+        last_name:
+          type: string
+        username:
+          type: string
+        photo_url:
+          type: string
+        auth_date:
+          type: number
+        hash:
+          type: string
+    AdminSession:
+      type: object
+      required: [authenticated, adminId]
+      properties:
+        authenticated:
+          type: boolean
+        adminId:
+          type: ["number", "null"]
+        firstName:
+          type: ["string", "null"]
+        username:
+          type: ["string", "null"]
+    TelegramBot:
+      type: object
+      required: [username]
+      properties:
+        username:
+          type: string
 
