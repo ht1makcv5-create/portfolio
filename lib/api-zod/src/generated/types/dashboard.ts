@@ -12,5 +12,8 @@ export interface Dashboard {
   newCount: number;
   orderCount: number;
   completedCount: number;
+  totalVisits: number;
+  uniqueVisitors: number;
+  todayVisitors: number;
   recent: Request[];
 }

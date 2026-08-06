@@ -102,6 +102,24 @@ export const UpdateRequestResponse = zod.object({
 
 
 /**
+ * @summary Track a public portfolio visit
+ */
+export const trackVisitBodySessionIdMin = 16;
+export const trackVisitBodySessionIdMax = 128;
+
+export const trackVisitBodyPathMax = 256;
+
+
+
+export const TrackVisitBody = zod.object({
+  "sessionId": zod.string().min(trackVisitBodySessionIdMin).max(trackVisitBodySessionIdMax),
+  "path": zod.string().min(1).max(trackVisitBodyPathMax)
+})
+
+export const TrackVisitResponse = zod.void()
+
+
+/**
  * @summary Get dashboard statistics
  */
 export const GetDashboardResponse = zod.object({
@@ -109,6 +127,9 @@ export const GetDashboardResponse = zod.object({
   "newCount": zod.number(),
   "orderCount": zod.number(),
   "completedCount": zod.number(),
+  "totalVisits": zod.number(),
+  "uniqueVisitors": zod.number(),
+  "todayVisitors": zod.number(),
   "recent": zod.array(zod.object({
   "id": zod.number(),
   "kind": zod.enum(['contact', 'order']),

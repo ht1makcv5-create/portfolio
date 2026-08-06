@@ -6,8 +6,8 @@ import {
   GetAdminSessionResponse,
   GetDashboardResponse,
 } from "@workspace/api-zod";
-import { count, desc, eq } from "drizzle-orm";
-import { db, requestsTable } from "@workspace/db";
+import { count, countDistinct, desc, eq, gte } from "drizzle-orm";
+import { db, requestsTable, visitsTable } from "@workspace/db";
 import {
   clearAdminSession,
   getAdminSession,
@@ -67,11 +67,28 @@ router.delete("/admin/session", (_req, res) => {
 
 router.get("/dashboard", async (req, res): Promise<void> => {
   if (!requireAdmin(req, res)) return;
-  const [total, newCount, orderCount, completedCount, recent] = await Promise.all([
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const [
+    total,
+    newCount,
+    orderCount,
+    completedCount,
+    totalVisits,
+    uniqueVisitors,
+    todayVisitors,
+    recent,
+  ] = await Promise.all([
     db.select({ count: count() }).from(requestsTable),
     db.select({ count: count() }).from(requestsTable).where(eq(requestsTable.status, "new")),
     db.select({ count: count() }).from(requestsTable).where(eq(requestsTable.kind, "order")),
     db.select({ count: count() }).from(requestsTable).where(eq(requestsTable.status, "completed")),
+    db.select({ count: count() }).from(visitsTable),
+    db.select({ count: countDistinct(visitsTable.sessionId) }).from(visitsTable),
+    db
+      .select({ count: countDistinct(visitsTable.sessionId) })
+      .from(visitsTable)
+      .where(gte(visitsTable.createdAt, today)),
     db.select().from(requestsTable).orderBy(desc(requestsTable.createdAt)).limit(5),
   ]);
   res.json(
@@ -80,6 +97,9 @@ router.get("/dashboard", async (req, res): Promise<void> => {
       newCount: Number(newCount[0]?.count ?? 0),
       orderCount: Number(orderCount[0]?.count ?? 0),
       completedCount: Number(completedCount[0]?.count ?? 0),
+      totalVisits: Number(totalVisits[0]?.count ?? 0),
+      uniqueVisitors: Number(uniqueVisitors[0]?.count ?? 0),
+      todayVisitors: Number(todayVisitors[0]?.count ?? 0),
       recent,
     }),
   );

@@ -21,3 +21,4 @@ export * from './requestUpdate';
 export * from './requestUpdateStatus';
 export * from './telegramBot';
 export * from './telegramLogin';
+export * from './visitInput';

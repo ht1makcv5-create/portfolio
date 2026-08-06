@@ -7,7 +7,7 @@ import type { LucideIcon } from 'lucide-react';
 import {
   getGetAdminSessionQueryKey, getGetDashboardQueryKey, getListRequestsQueryKey,
   useCreateAdminSession, useCreateRequest, useDeleteAdminSession, useGetAdminSession,
-  useGetDashboard, useGetTelegramBot, useListRequests, useUpdateRequest,
+  useGetDashboard, useGetTelegramBot, useListRequests, useTrackVisit, useUpdateRequest,
 } from '@workspace/api-client-react';
 import type { Request as StudioRequest } from '@workspace/api-client-react';
 import NotFound from '@/pages/not-found';
@@ -25,7 +25,8 @@ function Mark() {
 
 function PublicNav() {
   const [open, setOpen] = useState(false);
-  return <header className="absolute inset-x-0 top-0 z-20 px-5 py-5 md:px-10 md:py-7">
+  const [orderOpen, setOrderOpen] = useState(false);
+  return <header className="fixed inset-x-0 top-0 z-40 border-b border-border/50 bg-background/90 px-5 py-4 backdrop-blur-md md:px-10 md:py-5">
     <div className="mx-auto flex max-w-[1380px] items-center justify-between">
       <Link href="/" data-testid="link-logo"><Mark /></Link>
       <nav className={`${open ? 'flex' : 'hidden'} absolute left-5 right-5 top-16 flex-col gap-5 rounded-md border border-border bg-card p-5 text-sm md:static md:flex md:flex-row md:items-center md:gap-8 md:border-0 md:bg-transparent md:p-0`}>
@@ -34,12 +35,54 @@ function PublicNav() {
         <a href="#contact" data-testid="link-contact" className="hover:text-accent transition-colors">Start a conversation</a>
         <Link href="/admin" data-testid="link-admin" className="mono text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-accent">Studio desk ↗</Link>
       </nav>
-      <button onClick={() => setOpen(!open)} className="md:hidden" data-testid="button-mobile-menu" aria-label="Toggle menu">{open ? <X size={22} /> : <Menu size={22} />}</button>
+      <div className="flex items-center gap-3">
+        <button onClick={() => setOrderOpen(true)} data-testid="button-order-site-top" className="inline-flex bg-[#e35e50] px-3 py-2 text-[11px] font-semibold text-[#2b2031] transition-transform hover:-translate-y-0.5 sm:px-4 sm:py-2.5 sm:text-xs">Замовити сайт</button>
+        <button onClick={() => setOpen(!open)} className="md:hidden" data-testid="button-mobile-menu" aria-label="Toggle menu">{open ? <X size={22} /> : <Menu size={22} />}</button>
+      </div>
     </div>
+    {orderOpen && <OrderPanel onClose={() => setOrderOpen(false)} />}
   </header>;
 }
 
+function OrderPanel({ onClose }: { onClose: () => void }) {
+  const create = useCreateRequest();
+  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({ name: '', contact: '', service: '', budget: '', message: '' });
+  const update = (key: keyof typeof form, value: string) => setForm(current => ({ ...current, [key]: value }));
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    create.mutate(
+      { data: { kind: 'order', ...form, service: form.service || undefined, budget: form.budget || undefined } },
+      { onSuccess: () => { setSent(true); setForm({ name: '', contact: '', service: '', budget: '', message: '' }); } },
+    );
+  };
+  return <div className="fixed inset-0 z-50 flex items-start justify-end bg-[#2b2031]/35 p-3 pt-20 sm:p-5 sm:pt-24" role="dialog" aria-modal="true" data-testid="dialog-order-panel">
+    <div className="max-h-[calc(100dvh-6rem)] w-full max-w-md overflow-y-auto border border-border bg-[#f5e8d0] p-6 text-[#2b2031] shadow-2xl sm:p-8">
+      <div className="mb-7 flex items-start justify-between gap-5"><div><p className="mono text-[10px] uppercase tracking-[.2em] text-[#e35e50]">Нове замовлення</p><h2 className="serif mt-2 text-4xl">Замовити сайт</h2></div><button onClick={onClose} data-testid="button-close-order-panel" className="rounded-full border border-[#2b2031]/20 p-2 hover:bg-[#2b2031]/5"><X size={17} /></button></div>
+      {sent ? <div className="py-8"><span className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-[#e35e50]"><Check size={19} /></span><h3 className="serif text-4xl">Заявку прийнято.</h3><p className="mt-3 text-sm leading-relaxed text-[#2b2031]/65">Дані вже відправлено в робочий Telegram-бот. Ми звʼяжемося з вами за вказаним контактом.</p><button onClick={onClose} data-testid="button-close-sent-panel" className="mt-7 border-b border-[#2b2031] pb-1 text-sm">Закрити</button></div> :
+      <form onSubmit={submit} className="space-y-5">
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Ваше імʼя</span><input required minLength={2} value={form.name} onChange={e => update('name', e.target.value)} data-testid="input-panel-name" className="w-full border-b border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50]" /></label>
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Телефон, Telegram або email</span><input required minLength={3} value={form.contact} onChange={e => update('contact', e.target.value)} data-testid="input-panel-contact" className="w-full border-b border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50]" /></label>
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Що потрібно зробити</span><select value={form.service} onChange={e => update('service', e.target.value)} data-testid="select-panel-service" className="w-full border-b border-[#2b2031]/25 bg-[#f5e8d0] py-2 text-sm outline-none focus:border-[#e35e50]"><option value="">Оберіть послугу</option>{services.map(service => <option key={service}>{service}</option>)}</select></label>
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Коротко про завдання</span><textarea required minLength={5} rows={3} value={form.message} onChange={e => update('message', e.target.value)} data-testid="input-panel-message" className="w-full resize-none border-b border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50]" /></label>
+        {create.isError && <p className="flex items-center gap-2 text-xs text-[#b94035]"><CircleAlert size={14} /> Не вдалося відправити. Спробуйте ще раз.</p>}
+        <button disabled={create.isPending} type="submit" data-testid="button-panel-submit" className="w-full bg-[#e35e50] px-5 py-3 text-sm font-semibold text-[#2b2031] disabled:opacity-50">{create.isPending ? 'Відправляємо…' : 'Надіслати замовлення'}</button>
+      </form>}
+    </div>
+  </div>;
+}
+
 function Portfolio() {
+  const trackVisit = useTrackVisit();
+  useEffect(() => {
+    const storageKey = 'yana-visitor-session';
+    let sessionId = localStorage.getItem(storageKey);
+    if (!sessionId) {
+      sessionId = `${crypto.randomUUID()}-${Date.now()}`;
+      localStorage.setItem(storageKey, sessionId);
+    }
+    trackVisit.mutate({ data: { sessionId, path: window.location.pathname } });
+  }, []);
   return <div className="grain min-h-[100dvh] overflow-hidden bg-background">
     <PublicNav />
     <main>
@@ -158,6 +201,11 @@ function Dashboard({ session, onLogout }: { session: { firstName?: string | null
         ['Orders', metrics?.orderCount ?? '—', Paperclip],
         ['Completed', metrics?.completedCount ?? '—', Check],
       ] as [string, string | number, LucideIcon][]).map(([label, value, Icon]) => <div key={label} className="border border-border bg-card p-5"><div className="mb-8 flex justify-between text-muted-foreground"><span className="text-sm">{label}</span><Icon size={17} /></div><strong className="serif text-5xl font-normal">{value}</strong></div>)}</div>
+      <div className="mb-10 grid gap-3 border-y border-border py-3 sm:grid-cols-3">
+        <div className="px-2 py-2"><p className="mono text-[10px] uppercase tracking-wider text-muted-foreground">All visits</p><strong className="mt-2 block text-2xl">{metrics?.totalVisits ?? '—'}</strong></div>
+        <div className="px-2 py-2"><p className="mono text-[10px] uppercase tracking-wider text-muted-foreground">Unique visitors</p><strong className="mt-2 block text-2xl">{metrics?.uniqueVisitors ?? '—'}</strong></div>
+        <div className="px-2 py-2"><p className="mono text-[10px] uppercase tracking-wider text-muted-foreground">Visitors today</p><strong className="mt-2 block text-2xl">{metrics?.todayVisitors ?? '—'}</strong></div>
+      </div>
       <div className="mb-5 flex flex-col gap-3 border-y border-border py-4 md:flex-row"><div className="relative flex-1"><input value={search} onChange={e => setSearch(e.target.value)} data-testid="input-search-requests" placeholder="Search names, contacts, messages…" className="w-full bg-transparent py-2 text-sm outline-none" /></div><select value={status} onChange={e => setStatus(e.target.value)} data-testid="select-filter-status" className="border border-border bg-card px-3 py-2 text-sm"><option value="">Every status</option>{statuses.map(s => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}</select><select value={kind} onChange={e => setKind(e.target.value)} data-testid="select-filter-kind" className="border border-border bg-card px-3 py-2 text-sm"><option value="">All types</option><option value="order">Orders</option><option value="contact">Contacts</option></select></div>
       {requests.isLoading ? <div className="space-y-2">{[1,2,3].map(n => <div key={n} className="h-28 animate-pulse bg-muted" />)}</div> : requests.isError ? <div className="border border-destructive/30 bg-destructive/5 p-8 text-sm text-destructive">Couldn’t load the request list. Refresh to try again.</div> : !requests.data?.length ? <div className="border border-border bg-card p-14 text-center"><PenLine className="mx-auto mb-4 text-accent" /><h2 className="serif text-4xl">Nothing here yet.</h2><p className="mt-2 text-sm text-muted-foreground">Try a different filter, or wait for the next good idea.</p></div> : <div className="space-y-2">{requests.data.map((request, index) => <RequestRow key={request.id} request={request} onStatus={patch} index={index} />)}</div>}
     </main>

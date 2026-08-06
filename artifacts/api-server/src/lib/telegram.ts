@@ -72,7 +72,18 @@ export async function notifyAdmin(request: {
     {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ chat_id: adminChatId, text: lines.join("\n") }),
+      body: JSON.stringify({
+        chat_id: adminChatId,
+        text: lines.join("\n"),
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: "Виконано", callback_data: `order:done:${request.id}` },
+              { text: "Не виконано", callback_data: `order:pending:${request.id}` },
+            ],
+          ],
+        },
+      }),
     },
   );
   if (!response.ok) throw new Error("Telegram notification failed");

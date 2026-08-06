@@ -108,6 +108,22 @@ paths:
           description: Admin session required
         "404":
           description: Request not found
+  /visits:
+    post:
+      operationId: trackVisit
+      tags: [requests]
+      summary: Track a public portfolio visit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VisitInput"
+      responses:
+        "204":
+          description: Visit recorded
+        "400":
+          description: Invalid visit
   /dashboard:
     get:
       operationId: getDashboard
@@ -238,7 +254,7 @@ components:
           type: string
     Dashboard:
       type: object
-      required: [total, newCount, orderCount, completedCount, recent]
+      required: [total, newCount, orderCount, completedCount, totalVisits, uniqueVisitors, todayVisitors, recent]
       properties:
         total:
           type: number
@@ -248,10 +264,28 @@ components:
           type: number
         completedCount:
           type: number
+        totalVisits:
+          type: number
+        uniqueVisitors:
+          type: number
+        todayVisitors:
+          type: number
         recent:
           type: array
           items:
             $ref: "#/components/schemas/Request"
+    VisitInput:
+      type: object
+      required: [sessionId, path]
+      properties:
+        sessionId:
+          type: string
+          minLength: 16
+          maxLength: 128
+        path:
+          type: string
+          minLength: 1
+          maxLength: 256
     TelegramLogin:
       type: object
       required: [id, first_name, auth_date, hash]

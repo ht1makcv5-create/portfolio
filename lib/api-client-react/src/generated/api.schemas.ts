@@ -83,7 +83,23 @@ export interface Dashboard {
   newCount: number;
   orderCount: number;
   completedCount: number;
+  totalVisits: number;
+  uniqueVisitors: number;
+  todayVisitors: number;
   recent: Request[];
+}
+
+export interface VisitInput {
+  /**
+     * @minLength 16
+     * @maxLength 128
+     */
+  sessionId: string;
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  path: string;
 }
 
 export interface TelegramLogin {

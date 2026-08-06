@@ -28,7 +28,8 @@ import type {
   RequestInput,
   RequestUpdate,
   TelegramBot,
-  TelegramLogin
+  TelegramLogin,
+  VisitInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -361,6 +362,77 @@ export const useUpdateRequest = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getUpdateRequestMutationOptions(options));
+    }
+
+export const getTrackVisitUrl = () => {
+
+
+
+
+  return `/api/visits`
+}
+
+/**
+ * @summary Track a public portfolio visit
+ */
+export const trackVisit = async (visitInput: VisitInput, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getTrackVisitUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(visitInput)
+  }
+);}
+
+
+
+
+
+export const getTrackVisitMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackVisit>>, TError,{data: BodyType<VisitInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof trackVisit>>, TError,{data: BodyType<VisitInput>}, TContext> => {
+
+const mutationKey = ['trackVisit'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof trackVisit>>, {data: BodyType<VisitInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  trackVisit(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TrackVisitMutationResult = NonNullable<Awaited<ReturnType<typeof trackVisit>>>
+    export type TrackVisitMutationBody = BodyType<VisitInput>
+    export type TrackVisitMutationError = ErrorType<void>
+
+    /**
+ * @summary Track a public portfolio visit
+ */
+export const useTrackVisit = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof trackVisit>>, TError,{data: BodyType<VisitInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof trackVisit>>,
+        TError,
+        {data: BodyType<VisitInput>},
+        TContext
+      > => {
+      return useMutation(getTrackVisitMutationOptions(options));
     }
 
 export const getGetDashboardUrl = () => {
