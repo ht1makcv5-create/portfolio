@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "boohx Portfolio"
+description = "A dark cinematic personal portfolio site for boohx — a Ukrainian web designer/developer. Features a 3D ghost mascot, large editorial typography, top-nav multi-page layout (Projects, About, Services, Contact), and mobile hamburger menu."
+version = "1.0.0"
+id = "artifacts/boohx"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20545
+
+[services.development]
+run = "pnpm --filter @workspace/boohx run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/boohx", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/boohx/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20545"
+BASE_PATH = "/"
