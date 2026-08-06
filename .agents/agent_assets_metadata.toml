@@ -5,5 +5,5 @@ generated = []
 id = "h-YuHL6LcusO9DU8jRzRM"
 uri = "file://portfolio-railway-final.zip"
 type = "unspecified"
-title = "Portfolio Railway — готовий ZIP"
-description = "Чистий пакет для Railway: сайт, API, Telegram polling-бот, статистика відвідувань, PostgreSQL-схема, railway.json та інструкція RAILWAY_DEPLOY.md. Без секретів, node_modules, .git і тестових даних."
+title = "Portfolio Railway — оновлений ZIP"
+description = "Актуальна версія з глобальною кнопкою «Замовити сайт» на всіх маршрутах, включно з /admin, і міні-панеллю форми. Без секретів, node_modules, .git і тестових даних."

@@ -25,7 +25,6 @@ function Mark() {
 
 function PublicNav() {
   const [open, setOpen] = useState(false);
-  const [orderOpen, setOrderOpen] = useState(false);
   return <header className="fixed inset-x-0 top-0 z-40 border-b border-border/50 bg-background/90 px-5 py-4 backdrop-blur-md md:px-10 md:py-5">
     <div className="mx-auto flex max-w-[1380px] items-center justify-between">
       <Link href="/" data-testid="link-logo"><Mark /></Link>
@@ -36,12 +35,25 @@ function PublicNav() {
         <Link href="/admin" data-testid="link-admin" className="mono text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-accent">Studio desk ↗</Link>
       </nav>
       <div className="flex items-center gap-3">
-        <button onClick={() => setOrderOpen(true)} data-testid="button-order-site-top" className="inline-flex bg-[#e35e50] px-3 py-2 text-[11px] font-semibold text-[#2b2031] transition-transform hover:-translate-y-0.5 sm:px-4 sm:py-2.5 sm:text-xs">Замовити сайт</button>
         <button onClick={() => setOpen(!open)} className="md:hidden" data-testid="button-mobile-menu" aria-label="Toggle menu">{open ? <X size={22} /> : <Menu size={22} />}</button>
       </div>
     </div>
-    {orderOpen && <OrderPanel onClose={() => setOrderOpen(false)} />}
   </header>;
+}
+
+function GlobalOrderCta() {
+  const [orderOpen, setOrderOpen] = useState(false);
+  return <>
+    <button
+      onClick={() => setOrderOpen(true)}
+      data-testid="button-order-site-global"
+      aria-label="Відкрити форму замовлення сайту"
+      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 bg-[#e35e50] px-5 py-3.5 text-sm font-semibold text-[#2b2031] shadow-[0_10px_30px_rgba(43,32,49,.2)] transition-transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#2b2031] focus:ring-offset-2 focus:ring-offset-background"
+    >
+      Замовити сайт <ArrowUpRight size={16} />
+    </button>
+    {orderOpen && <OrderPanel onClose={() => setOrderOpen(false)} />}
+  </>;
 }
 
 function OrderPanel({ onClose }: { onClose: () => void }) {
@@ -220,5 +232,5 @@ function RequestRow({ request, onStatus, index }: { request: StudioRequest; onSt
 function Router() {
   return <Switch><Route path="/" component={Portfolio} /><Route path="/admin" component={Admin} /><Route component={NotFound} /></Switch>;
 }
-function App() { return <QueryClientProvider client={queryClient}><TooltipProvider><WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}><Router /></WouterRouter><Toaster /></TooltipProvider></QueryClientProvider>; }
+function App() { return <QueryClientProvider client={queryClient}><TooltipProvider><WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}><Router /></WouterRouter><GlobalOrderCta /><Toaster /></TooltipProvider></QueryClientProvider>; }
 export default App;
