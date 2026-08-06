@@ -78,7 +78,7 @@ function OrderPanel({ onClose }: { onClose: () => void }) {
         <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Що потрібно зробити</span><select value={form.service} onChange={e => update('service', e.target.value)} data-testid="select-panel-service" className="w-full border-b border-[#2b2031]/25 bg-[#f5e8d0] py-2 text-sm outline-none focus:border-[#e35e50]"><option value="">Оберіть послугу</option>{services.map(service => <option key={service}>{service}</option>)}</select></label>
         <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Коротко про завдання</span><textarea required minLength={5} rows={3} value={form.message} onChange={e => update('message', e.target.value)} data-testid="input-panel-message" className="w-full resize-none border-b border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50]" /></label>
         {create.isError && <p className="flex items-center gap-2 text-xs text-[#b94035]"><CircleAlert size={14} /> Не вдалося відправити. Спробуйте ще раз.</p>}
-        <button disabled={create.isPending} type="submit" data-testid="button-panel-submit" className="w-full bg-[#e35e50] px-5 py-3 text-sm font-semibold text-[#2b2031] disabled:opacity-50">{create.isPending ? 'Відправляємо…' : 'Надіслати замовлення'}</button>
+        <button disabled={create.isPending} type="submit" data-testid="button-panel-submit" className="w-full bg-[#e35e50] px-5 py-3 text-sm font-semibold text-[#2b2031] disabled:opacity-50">{create.isPending ? 'Відправляємо…' : 'Відправити'}</button>
       </form>}
     </div>
   </div>;
