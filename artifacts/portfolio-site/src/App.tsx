@@ -29,10 +29,10 @@ function PublicNav() {
     <div className="mx-auto flex max-w-[1380px] items-center justify-between">
       <Link href="/" data-testid="link-logo"><Mark /></Link>
       <nav className={`${open ? 'flex' : 'hidden'} absolute left-5 right-5 top-16 flex-col gap-5 rounded-md border border-border bg-card p-5 text-sm md:static md:flex md:flex-row md:items-center md:gap-8 md:border-0 md:bg-transparent md:p-0`}>
-        <a href="#work" data-testid="link-work" className="hover:text-accent transition-colors">Selected work</a>
-        <a href="#approach" data-testid="link-approach" className="hover:text-accent transition-colors">Approach</a>
-        <a href="#contact" data-testid="link-contact" className="hover:text-accent transition-colors">Start a conversation</a>
-        <Link href="/admin" data-testid="link-admin" className="mono text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-accent">Studio desk ↗</Link>
+        <a href="#work" data-testid="link-work" className="hover:text-accent transition-colors">Наші роботи</a>
+        <a href="#approach" data-testid="link-approach" className="hover:text-accent transition-colors">Підхід</a>
+        <a href="#contact" data-testid="link-contact" className="hover:text-accent transition-colors">Обговорити проєкт</a>
+        <Link href="/admin" data-testid="link-admin" className="mono text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-accent">Кабінет студії ↗</Link>
       </nav>
       <div className="flex items-center gap-3">
         <button onClick={() => setOpen(!open)} className="md:hidden" data-testid="button-mobile-menu" aria-label="Toggle menu">{open ? <X size={22} /> : <Menu size={22} />}</button>
@@ -48,9 +48,9 @@ function GlobalOrderCta() {
       onClick={() => setOrderOpen(true)}
       data-testid="button-order-site-global"
       aria-label="Відкрити форму замовлення сайту"
-      className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 bg-[#e35e50] px-5 py-3.5 text-sm font-semibold text-[#2b2031] shadow-[0_10px_30px_rgba(43,32,49,.2)] transition-transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#2b2031] focus:ring-offset-2 focus:ring-offset-background"
+      className="fixed right-4 top-3 z-[60] inline-flex items-center gap-2 border border-[#2b2031]/15 bg-[#e35e50] px-4 py-3 text-[11px] font-bold uppercase tracking-[.08em] text-[#2b2031] shadow-[0_10px_30px_rgba(43,32,49,.2)] transition-transform hover:-translate-y-1 sm:right-8 sm:top-4 sm:px-5 sm:py-3.5 sm:text-xs focus:outline-none focus:ring-2 focus:ring-[#2b2031] focus:ring-offset-2 focus:ring-offset-background"
     >
-      Замовити сайт <ArrowUpRight size={16} />
+      Замовити сайт <ArrowUpRight size={15} />
     </button>
     {orderOpen && <OrderPanel onClose={() => setOrderOpen(false)} />}
   </>;
@@ -101,12 +101,12 @@ function Portfolio() {
       <section className="relative px-5 pb-24 pt-36 md:px-10 md:pb-36 md:pt-48">
         <div className="mx-auto grid max-w-[1380px] items-end gap-14 md:grid-cols-[1.1fr_.9fr]">
           <div className="reveal">
-            <p className="mono mb-7 text-[10px] uppercase tracking-[.2em] text-accent">Independent creative studio · Kyiv / anywhere</p>
-            <h1 className="max-w-4xl text-[clamp(4rem,10vw,10.5rem)] leading-[.82] tracking-[-.075em]">We make<br /><span className="serif font-normal italic text-accent">meaning</span> visible.</h1>
+            <p className="mono mb-7 text-[10px] uppercase tracking-[.2em] text-accent">Креативна студія · Київ / будь-де</p>
+            <h1 className="max-w-4xl text-[clamp(4rem,10vw,10.5rem)] leading-[.82] tracking-[-.075em]">Створюємо<br /><span className="serif font-normal italic text-accent">сайти</span> з характером.</h1>
           </div>
           <div className="reveal max-w-sm pb-2 md:justify-self-end" style={{ animationDelay: '.12s' }}>
-            <p className="text-lg leading-relaxed text-muted-foreground">Yana is a small creative studio for ideas with a pulse. We shape identities, spaces, and digital experiences that stay with people.</p>
-            <a href="#contact" data-testid="link-hero-start" className="mt-9 inline-flex items-center gap-3 border-b border-foreground pb-2 text-sm font-semibold hover:border-accent hover:text-accent transition-colors">Tell us what you’re making <ArrowUpRight size={16} /></a>
+            <p className="text-lg leading-relaxed text-muted-foreground">Yana — невелика студія для ідей із характером. Створюємо бренди, сайти та цифрові враження, які запамʼятовуються.</p>
+            <a href="#contact" data-testid="link-hero-start" className="mt-9 inline-flex items-center gap-3 border-b border-foreground pb-2 text-sm font-semibold hover:border-accent hover:text-accent transition-colors">Розкажіть про свій проєкт <ArrowUpRight size={16} /></a>
           </div>
         </div>
         <div className="pointer-events-none absolute -right-24 top-48 hidden h-80 w-80 rounded-full border border-accent/40 md:block" />
@@ -115,7 +115,7 @@ function Portfolio() {
 
       <section id="work" className="border-y border-border bg-muted/40 px-5 py-16 md:px-10 md:py-24">
         <div className="mx-auto max-w-[1380px]">
-          <div className="mb-12 flex items-end justify-between"><div><p className="mono mb-3 text-[10px] uppercase tracking-[.2em] text-accent">01 / Selected work</p><h2 className="serif text-5xl md:text-7xl">A few things we’ve<br /><i>made matter.</i></h2></div><span className="mono hidden text-[10px] text-muted-foreground md:block">2021—2024</span></div>
+          <div className="mb-12 flex items-end justify-between"><div><p className="mono mb-3 text-[10px] uppercase tracking-[.2em] text-accent">01 / Наші роботи</p><h2 className="serif text-5xl md:text-7xl">Проєкти, які<br /><i>мають значення.</i></h2></div><span className="mono hidden text-[10px] text-muted-foreground md:block">2021—2026</span></div>
           <div className="grid gap-5 md:grid-cols-[1.35fr_.65fr]">
             <article className="group min-h-[430px] overflow-hidden bg-[#d95b4f] p-7 text-[#f7e7cc] md:p-10"><div className="flex justify-between text-xs"><span>01 — Identity</span><span>Olha Studio</span></div><div className="mt-24 max-w-xl"><h3 className="serif text-7xl leading-[.8] md:text-9xl">Made<br /><i>slowly.</i></h3><p className="mt-7 max-w-xs text-sm leading-relaxed opacity-80">A tactile identity for a ceramics practice built around patient hands.</p></div><div className="mt-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#f7e7cc] transition-transform group-hover:translate-x-2"><ArrowUpRight size={17} /></div></article>
             <div className="grid gap-5">
@@ -128,7 +128,7 @@ function Portfolio() {
 
       <section id="approach" className="px-5 py-24 md:px-10 md:py-36">
         <div className="mx-auto grid max-w-[1380px] gap-14 md:grid-cols-[.6fr_1fr]">
-          <div><p className="mono mb-3 text-[10px] uppercase tracking-[.2em] text-accent">02 / How we work</p><p className="serif text-5xl leading-[.9] md:text-7xl">Good work<br /><i>takes noticing.</i></p></div>
+          <div><p className="mono mb-3 text-[10px] uppercase tracking-[.2em] text-accent">02 / Як ми працюємо</p><p className="serif text-5xl leading-[.9] md:text-7xl">Хороша робота<br /><i>починається з уваги.</i></p></div>
           <div className="grid gap-0 divide-y divide-border border-y border-border">
             {[['01', 'Listen first', 'Every project starts with questions. We find the human detail that makes your idea specific.'], ['02', 'Find the shape', 'Strategy, words, image, and motion come together as one clear point of view.'], ['03', 'Make it felt', 'We sweat the quiet parts — the texture, the pause, the thing people remember later.']].map(([n, title, copy]) => <div key={n} className="grid gap-5 py-7 md:grid-cols-[70px_1fr_1.3fr] md:items-start"><span className="mono text-[11px] text-accent">{n}</span><h3 className="text-xl font-semibold">{title}</h3><p className="leading-relaxed text-muted-foreground">{copy}</p></div>)}
           </div>
