@@ -1,168 +1,175 @@
-import { useMemo, useRef, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { MeshDistortMaterial, Sparkles } from '@react-three/drei';
-import * as THREE from 'three';
+import { useEffect, useRef, useState } from 'react';
 
-/* ------------------------------------------------------------------ */
-/* Smooth circular drift — replaces the old random-wobble Float        */
-/* ------------------------------------------------------------------ */
-function CircularDrift({ children }: { children: ReactNode }) {
-  const groupRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (groupRef.current) {
-      const speed = 0.45;
-      groupRef.current.position.x = Math.cos(t * speed) * 0.16;
-      groupRef.current.position.y = Math.sin(t * speed) * 0.16 + Math.sin(t * speed * 2) * 0.03;
-      groupRef.current.rotation.z = Math.sin(t * speed) * 0.05;
-    }
-  });
-
-  return <group ref={groupRef}>{children}</group>;
-}
-
-/* ------------------------------------------------------------------ */
-/* Eyes — two small dark spheres that gently track the pointer         */
-/* ------------------------------------------------------------------ */
-function Eyes() {
-  const leftRef = useRef<THREE.Mesh>(null);
-  const rightRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    const px = state.pointer.x * 0.14;
-    const py = state.pointer.y * 0.1;
-    if (leftRef.current) {
-      leftRef.current.position.x = THREE.MathUtils.lerp(leftRef.current.position.x, -0.34 + px, 0.08);
-      leftRef.current.position.y = THREE.MathUtils.lerp(leftRef.current.position.y, 0.12 + py, 0.08);
-    }
-    if (rightRef.current) {
-      rightRef.current.position.x = THREE.MathUtils.lerp(rightRef.current.position.x, 0.34 + px, 0.08);
-      rightRef.current.position.y = THREE.MathUtils.lerp(rightRef.current.position.y, 0.12 + py, 0.08);
-    }
-  });
-
-  return (
-    <>
-      <mesh ref={leftRef} position={[-0.34, 0.12, 1.25]}>
-        <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color="#150f2e" roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh ref={rightRef} position={[0.34, 0.12, 1.25]}>
-        <sphereGeometry args={[0.1, 16, 16]} />
-        <meshStandardMaterial color="#150f2e" roughness={0.3} metalness={0.1} />
-      </mesh>
-      <mesh position={[-0.29, 0.18, 1.33]}>
-        <sphereGeometry args={[0.028, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-      <mesh position={[0.39, 0.18, 1.33]}>
-        <sphereGeometry args={[0.028, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-    </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* The round, jelly-ish ghost body                                     */
-/* ------------------------------------------------------------------ */
-function GhostBody() {
-  const bodyRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (bodyRef.current) {
-      bodyRef.current.scale.x = 1 + Math.sin(t * 1.4) * 0.02;
-      bodyRef.current.scale.y = 1 + Math.sin(t * 1.4 + Math.PI / 2) * 0.025;
-    }
-  });
-
-  return (
-    <group>
-      <mesh ref={bodyRef}>
-        <sphereGeometry args={[1.35, 48, 48]} />
-        <MeshDistortMaterial
-          color="#6a55ff"
-          emissive="#3a29c9"
-          emissiveIntensity={0.55}
-          distort={0.2}
-          speed={1.6}
-          roughness={0.25}
-          metalness={0.15}
-        />
-      </mesh>
-      <mesh scale={0.7}>
-        <sphereGeometry args={[1.35, 20, 20]} />
-        <meshBasicMaterial color="#b7a8ff" transparent opacity={0.14} />
-      </mesh>
-      <Eyes />
-      <mesh position={[0, -0.42, 1.32]} rotation={[0.15, 0, Math.PI]}>
-        <torusGeometry args={[0.14, 0.032, 8, 24, Math.PI]} />
-        <meshStandardMaterial color="#150f2e" roughness={0.4} />
-      </mesh>
-    </group>
-  );
-}
-
-function Lights() {
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[2, 2, 3]} intensity={22} color="#8b7fff" distance={12} decay={2} />
-      <pointLight position={[-2, -1, 2]} intensity={10} color="#5b4aff" distance={10} decay={2} />
-      <pointLight position={[0, -2, -2]} intensity={8} color="#2c1fa8" distance={10} decay={2} />
-    </>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Public component                                                    */
-/* ------------------------------------------------------------------ */
 export default function GhostScene() {
-  const [ready, setReady] = useState(false);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const id = requestAnimationFrame(() => requestAnimationFrame(() => setReady(true)));
-    return () => cancelAnimationFrame(id);
+    const handle = (e: MouseEvent) => {
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
+      const ny = (e.clientY / window.innerHeight) * 2 - 1;
+      setMouse({ x: nx, y: ny });
+    };
+    window.addEventListener('mousemove', handle, { passive: true });
+    return () => window.removeEventListener('mousemove', handle);
   }, []);
 
-  const dpr = useMemo<[number, number]>(
-    () => [1, Math.min(1.5, typeof window !== 'undefined' ? window.devicePixelRatio : 1)],
-    []
-  );
+  // pupils follow the pointer, with a touch more travel than before
+  const pupilX = mouse.x * 7;
+  const pupilY = mouse.y * 5;
 
   return (
-    <div className="relative h-full w-full" aria-hidden>
+    <div
+      ref={containerRef}
+      className="relative flex h-full w-full items-center justify-center overflow-visible"
+      aria-hidden
+    >
+      {/* Ambient ground glow — breathing */}
       <div
         className="absolute bottom-[6%] left-1/2 -translate-x-1/2 rounded-full blur-3xl"
         style={{
-          width: '70%',
-          height: '16%',
-          background: 'radial-gradient(ellipse, rgba(90,72,255,0.3) 0%, transparent 70%)',
+          width: '72%',
+          height: '20%',
+          background: 'radial-gradient(ellipse, rgba(90,72,255,0.32) 0%, transparent 70%)',
           animation: 'ghostGlow 4s ease-in-out infinite',
         }}
       />
-      {ready && (
-        <Canvas
-          dpr={dpr}
-          gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-          camera={{ position: [0, 0, 5], fov: 42 }}
-          style={{ background: 'transparent' }}
+
+      {/* Faint orbit sparkles */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <span
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: 4 + (i % 3) * 2,
+            height: 4 + (i % 3) * 2,
+            background: '#a89bff',
+            filter: 'blur(0.5px)',
+            top: `${18 + i * 14}%`,
+            left: `${12 + ((i * 37) % 76)}%`,
+            opacity: 0.55,
+            animation: `sparkleFloat ${4.5 + i}s ease-in-out ${i * 0.4}s infinite`,
+          }}
+        />
+      ))}
+
+      {/* Ghost wrapper — floats in a smooth circular drift */}
+      <div
+        style={{
+          animation: 'ghostOrbit 7s ease-in-out infinite',
+          width: '78%',
+          maxWidth: 480,
+        }}
+      >
+        <svg
+          viewBox="0 0 220 240"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ overflow: 'visible', filter: 'drop-shadow(0 0 36px rgba(90,72,255,0.5))' }}
         >
-          <Lights />
-          <CircularDrift>
-            <GhostBody />
-          </CircularDrift>
-          <Sparkles count={14} scale={[3.2, 3.4, 2]} size={2.2} speed={0.35} color="#a89bff" opacity={0.5} />
-        </Canvas>
-      )}
+          <defs>
+            <radialGradient id="ghBody" cx="42%" cy="32%" r="68%">
+              <stop offset="0%" stopColor="#9c8fff" />
+              <stop offset="45%" stopColor="#6a55ff" />
+              <stop offset="100%" stopColor="#2c1fa8" />
+            </radialGradient>
+            <radialGradient id="ghGlow" cx="50%" cy="42%" r="58%">
+              <stop offset="0%" stopColor="#8b7fff" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#5b4aff" stopOpacity="0" />
+            </radialGradient>
+            <radialGradient id="ghHighlight" cx="35%" cy="24%" r="32%">
+              <stop offset="0%" stopColor="#e4e0ff" stopOpacity="0.65" />
+              <stop offset="100%" stopColor="#e4e0ff" stopOpacity="0" />
+            </radialGradient>
+            <radialGradient id="ghEye" cx="38%" cy="30%" r="62%">
+              <stop offset="0%" stopColor="#ffffff" />
+              <stop offset="100%" stopColor="#d8d4ff" />
+            </radialGradient>
+          </defs>
+
+          {/* Outer glow */}
+          <ellipse cx="110" cy="118" rx="92" ry="94" fill="url(#ghGlow)" />
+
+          {/* Round, jelly-ish body — animated blob path */}
+          <path fill="url(#ghBody)" style={{ animation: 'ghostBlob 5.5s ease-in-out infinite' }}>
+            <animate
+              attributeName="d"
+              dur="5.5s"
+              repeatCount="indefinite"
+              values="
+                M110 20 C160 20 196 62 196 112 C196 168 158 214 110 214 C62 214 24 168 24 112 C24 62 60 20 110 20 Z;
+                M110 24 C156 18 200 58 198 110 C200 166 154 210 110 210 C64 208 22 164 26 110 C22 60 64 22 110 24 Z;
+                M110 20 C160 20 196 62 196 112 C196 168 158 214 110 214 C62 214 24 168 24 112 C24 62 60 20 110 20 Z
+              "
+            />
+          </path>
+
+          {/* Highlight sheen */}
+          <ellipse cx="82" cy="72" rx="46" ry="34" fill="url(#ghHighlight)" />
+
+          {/* Eyes */}
+          <ellipse cx="80" cy="116" rx="19" ry="21" fill="url(#ghEye)" />
+          <ellipse cx="140" cy="116" rx="19" ry="21" fill="url(#ghEye)" />
+
+          <ellipse
+            cx={80 + pupilX}
+            cy={116 + pupilY}
+            rx="9.5"
+            ry="11"
+            fill="#160f30"
+            style={{ transition: 'cx 0.12s ease-out, cy 0.12s ease-out' }}
+          />
+          <ellipse
+            cx={140 + pupilX}
+            cy={116 + pupilY}
+            rx="9.5"
+            ry="11"
+            fill="#160f30"
+            style={{ transition: 'cx 0.12s ease-out, cy 0.12s ease-out' }}
+          />
+
+          <circle cx={76 + pupilX * 0.4} cy={110 + pupilY * 0.4} r="3.4" fill="white" opacity="0.85" />
+          <circle cx={136 + pupilX * 0.4} cy={110 + pupilY * 0.4} r="3.4" fill="white" opacity="0.85" />
+
+          {/* Smile — a proper upward-curving arc */}
+          <path
+            d="M 90 156 Q 110 174 130 156"
+            fill="none"
+            stroke="#160f30"
+            strokeWidth="5"
+            strokeLinecap="round"
+            opacity="0.75"
+          />
+
+          {/* Rosy cheeks */}
+          <ellipse cx="60" cy="140" rx="9" ry="6" fill="#ff9fd6" opacity="0.28" />
+          <ellipse cx="160" cy="140" rx="9" ry="6" fill="#ff9fd6" opacity="0.28" />
+        </svg>
+      </div>
 
       <style>{`
+        @keyframes ghostOrbit {
+          0%   { transform: translate(0px, 0px) rotate(0deg); }
+          25%  { transform: translate(10px, -14px) rotate(1deg); }
+          50%  { transform: translate(0px, -24px) rotate(0deg); }
+          75%  { transform: translate(-10px, -14px) rotate(-1deg); }
+          100% { transform: translate(0px, 0px) rotate(0deg); }
+        }
+        @keyframes ghostBlob {
+          0%   { transform: scale(1, 1); }
+          50%  { transform: scale(1.015, 0.985); }
+          100% { transform: scale(1, 1); }
+        }
         @keyframes ghostGlow {
           0%   { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
-          50%  { opacity: 1;   transform: translateX(-50%) scaleX(0.82); }
+          50%  { opacity: 1;   transform: translateX(-50%) scaleX(0.85); }
           100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
+        }
+        @keyframes sparkleFloat {
+          0%, 100% { transform: translateY(0px); opacity: 0.25; }
+          50%      { transform: translateY(-14px); opacity: 0.75; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          * { animation: none !important; }
         }
       `}</style>
     </div>
