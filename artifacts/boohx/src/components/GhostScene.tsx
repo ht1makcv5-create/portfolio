@@ -1,7 +1,27 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Float, MeshDistortMaterial, Sparkles } from '@react-three/drei';
+import { MeshDistortMaterial, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
+
+/* ------------------------------------------------------------------ */
+/* Smooth circular drift — replaces the old random-wobble Float        */
+/* ------------------------------------------------------------------ */
+function CircularDrift({ children }: { children: ReactNode }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    if (groupRef.current) {
+      const speed = 0.45;
+      groupRef.current.position.x = Math.cos(t * speed) * 0.16;
+      groupRef.current.position.y = Math.sin(t * speed) * 0.16 + Math.sin(t * speed * 2) * 0.03;
+      groupRef.current.rotation.z = Math.sin(t * speed) * 0.05;
+    }
+  });
+
+  return <group ref={groupRef}>{children}</group>;
+}
 
 /* ------------------------------------------------------------------ */
 /* Eyes — two small dark spheres that gently track the pointer         */
@@ -131,9 +151,9 @@ export default function GhostScene() {
           style={{ background: 'transparent' }}
         >
           <Lights />
-          <Float speed={1.6} rotationIntensity={0.28} floatIntensity={1.1} floatingRange={[-0.22, 0.22]}>
+          <CircularDrift>
             <GhostBody />
-          </Float>
+          </CircularDrift>
           <Sparkles count={14} scale={[3.2, 3.4, 2]} size={2.2} speed={0.35} color="#a89bff" opacity={0.5} />
         </Canvas>
       )}

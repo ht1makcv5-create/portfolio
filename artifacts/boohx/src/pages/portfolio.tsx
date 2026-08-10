@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState, Component } from 'react';
 import type { ReactNode, FormEvent } from 'react';
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
+import Lenis from 'lenis';
 
 const GhostScene = lazy(() => import('@/components/GhostScene'));
 
@@ -1669,10 +1670,13 @@ function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) 
     document.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const lenis = (window as unknown as { __boohxLenis?: { stop: () => void; start: () => void } }).__boohxLenis;
+    lenis?.stop();
     panelRef.current?.focus();
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
+      lenis?.start();
     };
   }, [onClose]);
 
@@ -1893,6 +1897,24 @@ export default function Portfolio() {
 
   const t = T[savedLang];
 
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+    const lenis = new Lenis({ duration: 1.1, smoothWheel: true, wheelMultiplier: 1 });
+    (window as unknown as { __boohxLenis?: Lenis }).__boohxLenis = lenis;
+    let raf: number;
+    const loop = (time: number) => {
+      lenis.raf(time);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => {
+      cancelAnimationFrame(raf);
+      lenis.destroy();
+      delete (window as unknown as { __boohxLenis?: Lenis }).__boohxLenis;
+    };
+  }, []);
+
   const toggleLang = () => {
     setSavedLang((prev) => {
       const next: Lang = prev === 'en' ? 'uk' : 'en';
@@ -1903,7 +1925,9 @@ export default function Portfolio() {
 
   const navigate = (page: Page) => {
     setLocation(page === 'home' ? '/' : `/${page}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const lenis = (window as unknown as { __boohxLenis?: { scrollTo: (v: number, opts?: object) => void } }).__boohxLenis;
+    if (lenis) lenis.scrollTo(0, { duration: 1 });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
