@@ -1,177 +1,141 @@
-import { useEffect, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Float, MeshDistortMaterial, Sparkles } from '@react-three/drei';
+import * as THREE from 'three';
 
-export default function GhostScene() {
-  const [mouse, setMouse] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
+/* ------------------------------------------------------------------ */
+/* Eyes — two small dark spheres that gently track the pointer         */
+/* ------------------------------------------------------------------ */
+function Eyes() {
+  const leftRef = useRef<THREE.Mesh>(null);
+  const rightRef = useRef<THREE.Mesh>(null);
 
-  useEffect(() => {
-    const handle = (e: MouseEvent) => {
-      const nx = (e.clientX / window.innerWidth) * 2 - 1;
-      const ny = (e.clientY / window.innerHeight) * 2 - 1;
-      setMouse({ x: nx, y: ny });
-    };
-    window.addEventListener('mousemove', handle, { passive: true });
-    return () => window.removeEventListener('mousemove', handle);
-  }, []);
-
-  // pupil offset — subtle follow
-  const pupilX = mouse.x * 5;
-  const pupilY = mouse.y * 4;
+  useFrame((state) => {
+    const px = state.pointer.x * 0.14;
+    const py = state.pointer.y * 0.1;
+    if (leftRef.current) {
+      leftRef.current.position.x = THREE.MathUtils.lerp(leftRef.current.position.x, -0.34 + px, 0.08);
+      leftRef.current.position.y = THREE.MathUtils.lerp(leftRef.current.position.y, 0.12 + py, 0.08);
+    }
+    if (rightRef.current) {
+      rightRef.current.position.x = THREE.MathUtils.lerp(rightRef.current.position.x, 0.34 + px, 0.08);
+      rightRef.current.position.y = THREE.MathUtils.lerp(rightRef.current.position.y, 0.12 + py, 0.08);
+    }
+  });
 
   return (
-    <div
-      ref={containerRef}
-      className="relative h-full w-full flex items-end justify-center overflow-visible"
-      aria-hidden
-    >
-      {/* Ambient ground glow */}
+    <>
+      <mesh ref={leftRef} position={[-0.34, 0.12, 0.98]}>
+        <sphereGeometry args={[0.1, 24, 24]} />
+        <meshStandardMaterial color="#150f2e" roughness={0.3} metalness={0.1} />
+      </mesh>
+      <mesh ref={rightRef} position={[0.34, 0.12, 0.98]}>
+        <sphereGeometry args={[0.1, 24, 24]} />
+        <meshStandardMaterial color="#150f2e" roughness={0.3} metalness={0.1} />
+      </mesh>
+      <mesh position={[-0.29, 0.18, 1.06]}>
+        <sphereGeometry args={[0.028, 12, 12]} />
+        <meshBasicMaterial color="#ffffff" />
+      </mesh>
+      <mesh position={[0.39, 0.18, 1.06]}>
+        <sphereGeometry args={[0.028, 12, 12]} />
+        <meshBasicMaterial color="#ffffff" />
+      </mesh>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* The round, jelly-ish ghost body                                     */
+/* ------------------------------------------------------------------ */
+function GhostBody() {
+  const bodyRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    if (bodyRef.current) {
+      bodyRef.current.scale.x = 1 + Math.sin(t * 1.4) * 0.02;
+      bodyRef.current.scale.y = 1 + Math.sin(t * 1.4 + Math.PI / 2) * 0.025;
+    }
+  });
+
+  return (
+    <group>
+      <mesh ref={bodyRef}>
+        <sphereGeometry args={[1.35, 96, 96]} />
+        <MeshDistortMaterial
+          color="#6a55ff"
+          emissive="#3a29c9"
+          emissiveIntensity={0.55}
+          distort={0.28}
+          speed={1.6}
+          roughness={0.25}
+          metalness={0.15}
+        />
+      </mesh>
+      <mesh scale={0.7}>
+        <sphereGeometry args={[1.35, 32, 32]} />
+        <meshBasicMaterial color="#b7a8ff" transparent opacity={0.14} />
+      </mesh>
+      <Eyes />
+      <mesh position={[0, -0.32, 1.28]}>
+        <torusGeometry args={[0.09, 0.022, 8, 24, Math.PI]} />
+        <meshStandardMaterial color="#150f2e" roughness={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
+function Lights() {
+  return (
+    <>
+      <ambientLight intensity={0.5} />
+      <pointLight position={[2, 2, 3]} intensity={22} color="#8b7fff" distance={12} decay={2} />
+      <pointLight position={[-2, -1, 2]} intensity={10} color="#5b4aff" distance={10} decay={2} />
+      <pointLight position={[0, -2, -2]} intensity={8} color="#2c1fa8" distance={10} decay={2} />
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Public component                                                    */
+/* ------------------------------------------------------------------ */
+export default function GhostScene() {
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
+
+  const dpr = useMemo<[number, number]>(
+    () => [1, Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio : 1)],
+    []
+  );
+
+  return (
+    <div className="relative h-full w-full" aria-hidden>
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full blur-3xl"
+        className="absolute bottom-[6%] left-1/2 -translate-x-1/2 rounded-full blur-3xl"
         style={{
-          width: '75%',
-          height: '18%',
-          background: 'radial-gradient(ellipse, rgba(90,72,255,0.28) 0%, transparent 70%)',
+          width: '70%',
+          height: '16%',
+          background: 'radial-gradient(ellipse, rgba(90,72,255,0.3) 0%, transparent 70%)',
           animation: 'ghostGlow 4s ease-in-out infinite',
         }}
       />
-
-      {/* Ghost SVG wrapper — floats up and down */}
-      <div
-        style={{
-          animation: 'ghostFloat 4.2s ease-in-out infinite',
-          transformOrigin: 'center bottom',
-          width: '82%',
-          maxWidth: 520,
-        }}
-      >
-        <svg
-          viewBox="0 0 200 260"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{ overflow: 'visible', filter: 'drop-shadow(0 0 32px rgba(90,72,255,0.45))' }}
+      {ready && (
+        <Canvas
+          dpr={dpr}
+          gl={{ alpha: true, antialias: true }}
+          camera={{ position: [0, 0, 5], fov: 42 }}
+          style={{ background: 'transparent' }}
         >
-          <defs>
-            {/* Body gradient — purple glow */}
-            <radialGradient id="bodyGrad" cx="45%" cy="35%" r="62%">
-              <stop offset="0%" stopColor="#8b7fff" />
-              <stop offset="55%" stopColor="#5b4aff" />
-              <stop offset="100%" stopColor="#2c1fa8" />
-            </radialGradient>
+          <Lights />
+          <Float speed={1.6} rotationIntensity={0.28} floatIntensity={1.1} floatingRange={[-0.22, 0.22]}>
+            <GhostBody />
+          </Float>
+          <Sparkles count={26} scale={[3.2, 3.4, 2]} size={2.2} speed={0.35} color="#a89bff" opacity={0.55} />
+        </Canvas>
+      )}
 
-            {/* Outer glow layer */}
-            <radialGradient id="glowGrad" cx="50%" cy="45%" r="55%">
-              <stop offset="0%" stopColor="#7b6cff" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#5b4aff" stopOpacity="0" />
-            </radialGradient>
-
-            {/* Inner highlight */}
-            <radialGradient id="highlightGrad" cx="38%" cy="28%" r="35%">
-              <stop offset="0%" stopColor="#ccc8ff" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#ccc8ff" stopOpacity="0" />
-            </radialGradient>
-
-            {/* Eye whites */}
-            <radialGradient id="eyeGrad" cx="38%" cy="32%" r="60%">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="100%" stopColor="#d8d4ff" />
-            </radialGradient>
-
-            <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2.5" />
-            </filter>
-          </defs>
-
-          {/* Outer glow blob */}
-          <ellipse cx="100" cy="108" rx="82" ry="85" fill="url(#glowGrad)" />
-
-          {/* Ghost body — dome + wavy skirt */}
-          <path
-            d="
-              M 100 18
-              C 56 18, 22 52, 22 96
-              L 22 190
-              Q 33 178, 44 190
-              Q 55 202, 66 190
-              Q 77 178, 88 190
-              Q 99 202, 110 190
-              Q 121 178, 132 190
-              Q 143 202, 154 190
-              Q 165 178, 176 190
-              L 178 96
-              C 178 52, 144 18, 100 18
-              Z
-            "
-            fill="url(#bodyGrad)"
-            style={{ animation: 'ghostWobble 3.8s ease-in-out infinite' }}
-          />
-
-          {/* Highlight sheen */}
-          <path
-            d="
-              M 100 18
-              C 56 18, 22 52, 22 96
-              L 22 190
-              Q 33 178, 44 190
-              Q 55 202, 66 190
-              Q 77 178, 88 190
-              Q 99 202, 110 190
-              Q 121 178, 132 190
-              Q 143 202, 154 190
-              Q 165 178, 176 190
-              L 178 96
-              C 178 52, 144 18, 100 18
-              Z
-            "
-            fill="url(#highlightGrad)"
-          />
-
-          {/* Left eye white */}
-          <ellipse cx="76" cy="102" rx="17" ry="19" fill="url(#eyeGrad)" />
-          {/* Right eye white */}
-          <ellipse cx="124" cy="102" rx="17" ry="19" fill="url(#eyeGrad)" />
-
-          {/* Left pupil — follows mouse */}
-          <ellipse
-            cx={76 + pupilX}
-            cy={102 + pupilY}
-            rx="9"
-            ry="10"
-            fill="#1a1230"
-            style={{ transition: 'cx 0.12s ease-out, cy 0.12s ease-out' }}
-          />
-          {/* Right pupil */}
-          <ellipse
-            cx={124 + pupilX}
-            cy={102 + pupilY}
-            rx="9"
-            ry="10"
-            fill="#1a1230"
-            style={{ transition: 'cx 0.12s ease-out, cy 0.12s ease-out' }}
-          />
-
-          {/* Eye glints */}
-          <circle cx={72 + pupilX * 0.4} cy={97 + pupilY * 0.4} r="3.2" fill="white" opacity="0.8" />
-          <circle cx={120 + pupilX * 0.4} cy={97 + pupilY * 0.4} r="3.2" fill="white" opacity="0.8" />
-
-          {/* Small mouth / expression */}
-          <ellipse cx="100" cy="142" rx="6" ry="4" fill="#1a1230" opacity="0.5" />
-        </svg>
-      </div>
-
-      {/* CSS keyframes injected via style tag */}
       <style>{`
-        @keyframes ghostFloat {
-          0%   { transform: translateY(0px) rotate(0deg); }
-          25%  { transform: translateY(-18px) rotate(0.8deg); }
-          50%  { transform: translateY(-28px) rotate(-0.5deg); }
-          75%  { transform: translateY(-14px) rotate(0.4deg); }
-          100% { transform: translateY(0px) rotate(0deg); }
-        }
-        @keyframes ghostWobble {
-          0%   { transform: scaleX(1) scaleY(1); }
-          30%  { transform: scaleX(1.015) scaleY(0.992); }
-          60%  { transform: scaleX(0.988) scaleY(1.008); }
-          100% { transform: scaleX(1) scaleY(1); }
-        }
         @keyframes ghostGlow {
           0%   { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
           50%  { opacity: 1;   transform: translateX(-50%) scaleX(0.82); }
