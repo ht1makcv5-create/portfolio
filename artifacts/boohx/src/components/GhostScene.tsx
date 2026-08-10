@@ -25,20 +25,20 @@ function Eyes() {
 
   return (
     <>
-      <mesh ref={leftRef} position={[-0.34, 0.12, 0.98]}>
-        <sphereGeometry args={[0.1, 24, 24]} />
+      <mesh ref={leftRef} position={[-0.34, 0.12, 1.25]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
         <meshStandardMaterial color="#150f2e" roughness={0.3} metalness={0.1} />
       </mesh>
-      <mesh ref={rightRef} position={[0.34, 0.12, 0.98]}>
-        <sphereGeometry args={[0.1, 24, 24]} />
+      <mesh ref={rightRef} position={[0.34, 0.12, 1.25]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
         <meshStandardMaterial color="#150f2e" roughness={0.3} metalness={0.1} />
       </mesh>
-      <mesh position={[-0.29, 0.18, 1.06]}>
-        <sphereGeometry args={[0.028, 12, 12]} />
+      <mesh position={[-0.29, 0.18, 1.33]}>
+        <sphereGeometry args={[0.028, 8, 8]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
-      <mesh position={[0.39, 0.18, 1.06]}>
-        <sphereGeometry args={[0.028, 12, 12]} />
+      <mesh position={[0.39, 0.18, 1.33]}>
+        <sphereGeometry args={[0.028, 8, 8]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
     </>
@@ -62,24 +62,24 @@ function GhostBody() {
   return (
     <group>
       <mesh ref={bodyRef}>
-        <sphereGeometry args={[1.35, 96, 96]} />
+        <sphereGeometry args={[1.35, 48, 48]} />
         <MeshDistortMaterial
           color="#6a55ff"
           emissive="#3a29c9"
           emissiveIntensity={0.55}
-          distort={0.28}
+          distort={0.2}
           speed={1.6}
           roughness={0.25}
           metalness={0.15}
         />
       </mesh>
       <mesh scale={0.7}>
-        <sphereGeometry args={[1.35, 32, 32]} />
+        <sphereGeometry args={[1.35, 20, 20]} />
         <meshBasicMaterial color="#b7a8ff" transparent opacity={0.14} />
       </mesh>
       <Eyes />
-      <mesh position={[0, -0.32, 1.28]}>
-        <torusGeometry args={[0.09, 0.022, 8, 24, Math.PI]} />
+      <mesh position={[0, -0.42, 1.32]} rotation={[0.15, 0, Math.PI]}>
+        <torusGeometry args={[0.14, 0.032, 8, 24, Math.PI]} />
         <meshStandardMaterial color="#150f2e" roughness={0.4} />
       </mesh>
     </group>
@@ -102,10 +102,13 @@ function Lights() {
 /* ------------------------------------------------------------------ */
 export default function GhostScene() {
   const [ready, setReady] = useState(false);
-  useEffect(() => setReady(true), []);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => requestAnimationFrame(() => setReady(true)));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   const dpr = useMemo<[number, number]>(
-    () => [1, Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio : 1)],
+    () => [1, Math.min(1.5, typeof window !== 'undefined' ? window.devicePixelRatio : 1)],
     []
   );
 
@@ -123,7 +126,7 @@ export default function GhostScene() {
       {ready && (
         <Canvas
           dpr={dpr}
-          gl={{ alpha: true, antialias: true }}
+          gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
           camera={{ position: [0, 0, 5], fov: 42 }}
           style={{ background: 'transparent' }}
         >
@@ -131,7 +134,7 @@ export default function GhostScene() {
           <Float speed={1.6} rotationIntensity={0.28} floatIntensity={1.1} floatingRange={[-0.22, 0.22]}>
             <GhostBody />
           </Float>
-          <Sparkles count={26} scale={[3.2, 3.4, 2]} size={2.2} speed={0.35} color="#a89bff" opacity={0.55} />
+          <Sparkles count={14} scale={[3.2, 3.4, 2]} size={2.2} speed={0.35} color="#a89bff" opacity={0.5} />
         </Canvas>
       )}
 
