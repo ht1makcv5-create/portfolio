@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, Component } from 'react';
-import type { ReactNode } from 'react';
+import type { ReactNode, FormEvent } from 'react';
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'wouter';
 
 const GhostScene = lazy(() => import('@/components/GhostScene'));
 
@@ -22,7 +23,40 @@ type Page = 'home' | 'projects' | 'about' | 'services' | 'contact' | 'case-mzsho
 /* ------------------------------------------------------------------ */
 /* Translations                                                        */
 /* ------------------------------------------------------------------ */
-const T = {
+interface Copy {
+  descriptor: string;
+  basedIn: string;
+  scroll: string;
+  navProjects: string;
+  navAbout: string;
+  navServices: string;
+  navContact: string;
+  selectedWork: string;
+  mzshopDesc: string;
+  moreWork: string;
+  about: string;
+  noteOnProcess: string;
+  aboutMain: string;
+  aboutSub: string;
+  skills: string[];
+  orderBtn: string;
+  contact: string;
+  letsBuild: string;
+  emailSub: string;
+  tgSub: string;
+  footerYear: string;
+  howItWorks: string;
+  howSteps: { step: string; desc: string }[];
+  ctaButton: string;
+  ctaBig: string;
+  ctaBigSub: string;
+  servicesTitle: string;
+  ctaSubtle: string;
+  ctaHeading: string;
+  ctaDesc: string;
+}
+
+const T: Record<Lang, Copy> = {
   en: {
     descriptor: 'web design · development',
     basedIn: 'solitary practice, based in kyiv',
@@ -99,7 +133,7 @@ const T = {
     ctaHeading: 'Безкоштовна консультація',
     ctaDesc: 'Опиши задачу в Telegram — потрібну послугу, терміни, орієнтовний бюджет. Зв\u02bfяжусь найближчим часом.',
   },
-} as const;
+};
 
 /* ------------------------------------------------------------------ */
 /* Services data                                                       */
@@ -126,9 +160,24 @@ const SERVICES = [
     uk: { title: 'UX / UI дизайн', short: 'Інтерфейси, що ведуть, а не плутають.', detail: 'Вайрфрейми, прототипи та фінальний дизайн у Figma. Зрозумілий інтерфейс, побудований навколо мети користувача.' },
   },
   {
+    id: 'frontend',
+    en: { title: 'Front-end Development', short: 'Turning design into a working site.', detail: 'I build the interface in code — responsive, fast, and true to the design. Clean, maintainable front-end that actually works the way it looks.' },
+    uk: { title: 'Frontend-розробка', short: 'Перетворюю дизайн на робочий сайт.', detail: 'Верстаю та програмую інтерфейс — адаптивно, швидко, у точній відповідності до дизайну. Чистий, підтримуваний код.' },
+  },
+  {
     id: 'branding',
     en: { title: 'Branding & Identity', short: 'A mark that means something.', detail: 'Logo, color palette, typography and brand guidelines. A consistent visual language across every touchpoint — web, print, social media.' },
     uk: { title: 'Брендинг + айдентика', short: 'Знак, що щось означає.', detail: 'Логотип, палітра, шрифти та гайдлайн бренду. Єдиний стиль для всіх точок контакту — сайт, друк, соцмережі.' },
+  },
+  {
+    id: 'launch',
+    en: { title: 'Website Launch', short: 'From finished build to production.', detail: 'Domain setup, hosting, final checks and going live. I make sure the site is genuinely ready for real visitors before launch day.' },
+    uk: { title: 'Запуск сайту', short: 'Від готової збірки до production.', detail: 'Налаштування домену, хостингу, фінальна перевірка та вихід у продакшн. Переконуюсь, що сайт справді готовий до реальних відвідувачів.' },
+  },
+  {
+    id: 'support',
+    en: { title: 'Ongoing Support', short: 'Help after the site goes live.', detail: 'Updates, fixes, and small improvements after launch — so the site keeps working and growing instead of gathering dust.' },
+    uk: { title: 'Підтримка сайту', short: 'Допомога після запуску.', detail: 'Оновлення, виправлення та невеликі покращення після запуску — щоб сайт не пилився, а розвивався.' },
   },
   {
     id: 'seo',
@@ -175,8 +224,9 @@ function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
     <motion.button
       onClick={onToggle}
       whileTap={{ scale: 0.92 }}
-      className="flex items-center gap-[3px] font-sans text-[11px] uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))]"
-      aria-label="Toggle language"
+      data-testid="button-lang-toggle"
+      className="flex items-center gap-[3px] rounded-sm font-sans text-[11px] uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+      aria-label={lang === 'uk' ? 'Перемкнути мову на англійську' : 'Switch language to Ukrainian'}
     >
       <AnimatePresence mode="wait">
         <motion.span
@@ -199,13 +249,15 @@ function LangToggle({ lang, onToggle }: { lang: Lang; onToggle: () => void }) {
 /* ------------------------------------------------------------------ */
 /* Hamburger button (mobile)                                          */
 /* ------------------------------------------------------------------ */
-function HamburgerButton({ onClick, isOpen }: { onClick: () => void; isOpen: boolean }) {
+function HamburgerButton({ onClick, isOpen, lang }: { onClick: () => void; isOpen: boolean; lang: Lang }) {
   return (
     <motion.button
       onClick={onClick}
       whileTap={{ scale: 0.9 }}
-      className="flex h-8 w-8 flex-col items-end justify-center gap-[5px]"
-      aria-label="Open menu"
+      data-testid="button-mobile-menu"
+      className="flex h-11 w-11 flex-col items-end justify-center gap-[5px] p-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+      aria-label={isOpen ? (lang === 'uk' ? 'Закрити меню' : 'Close menu') : (lang === 'uk' ? 'Відкрити меню' : 'Open menu')}
+      aria-expanded={isOpen}
     >
       <motion.span
         className="h-px bg-[hsl(var(--foreground))] origin-right"
@@ -244,7 +296,7 @@ function MobileMenu({
   onNavigate: (page: Page) => void;
   lang: Lang;
   onToggleLang: () => void;
-  t: typeof T['en'];
+  t: Copy;
 }) {
   const navItems: { page: Page; label: string }[] = [
     { page: 'home', label: 'boohx™' },
@@ -254,10 +306,22 @@ function MobileMenu({
     { page: 'contact', label: t.navContact },
   ];
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label={lang === 'uk' ? 'Меню навігації' : 'Navigation menu'}
           initial={{ opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
           animate={{ opacity: 1, clipPath: 'inset(0 0 0% 0)' }}
           exit={{ opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
@@ -272,7 +336,8 @@ function MobileMenu({
               <motion.button
                 onClick={onClose}
                 whileTap={{ scale: 0.9 }}
-                className="font-sans text-[11px] uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors"
+                data-testid="button-close-mobile-menu"
+                className="rounded-sm font-sans text-[11px] uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               >
                 {lang === 'uk' ? 'Закрити' : 'Close'} ✕
               </motion.button>
@@ -288,7 +353,9 @@ function MobileMenu({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.45, delay: 0.05 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                 onClick={() => { onNavigate(item.page); onClose(); }}
-                className="text-left border-b border-[hsl(var(--border))] py-6 group"
+                aria-current={currentPage === item.page ? 'page' : undefined}
+                data-testid={`link-mobile-nav-${item.page}`}
+                className="text-left border-b border-[hsl(var(--border))] py-6 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               >
                 <span
                   className="font-serif italic transition-colors duration-300 group-hover:text-[hsl(var(--primary))]"
@@ -349,7 +416,8 @@ function TopNav({
         {/* Logo */}
         <motion.button
           onClick={() => onNavigate('home')}
-          className="font-sans text-[11px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors"
+          data-testid="link-logo"
+          className="rounded-sm font-sans text-[11px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
           whileTap={{ scale: 0.95 }}
         >
           boohx™
@@ -362,7 +430,9 @@ function TopNav({
               key={item.page}
               onClick={() => onNavigate(item.page)}
               whileTap={{ scale: 0.95 }}
-              className="relative px-4 py-1.5 font-sans text-[11px] uppercase tracking-[0.22em] transition-colors duration-300"
+              aria-current={currentPage === item.page ? 'page' : undefined}
+              data-testid={`link-nav-${item.page}`}
+              className="relative rounded-full px-4 py-1.5 font-sans text-[11px] uppercase tracking-[0.22em] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               style={{
                 color: currentPage === item.page
                   ? 'hsl(var(--foreground))'
@@ -389,7 +459,7 @@ function TopNav({
         {/* Mobile: lang + hamburger */}
         <div className="flex md:hidden items-center gap-4">
           <LangToggle lang={lang} onToggle={onToggleLang} />
-          <HamburgerButton onClick={() => setMobileOpen(true)} isOpen={false} />
+          <HamburgerButton onClick={() => setMobileOpen((o) => !o)} isOpen={mobileOpen} lang={lang} />
         </div>
       </header>
 
@@ -434,7 +504,7 @@ function PageWrap({ children, pageKey }: { children: ReactNode; pageKey: string 
 /* ------------------------------------------------------------------ */
 /* HOME page                                                           */
 /* ------------------------------------------------------------------ */
-function HomePage({ t }: { t: typeof T['en'] }) {
+function HomePage({ t, lang, onViewWork }: { t: Copy; lang: Lang; onViewWork: () => void }) {
   const letters = 'boohx'.split('');
 
   return (
@@ -520,6 +590,20 @@ function HomePage({ t }: { t: typeof T['en'] }) {
             </motion.span>
           </AnimatePresence>
         </motion.div>
+
+        <motion.button
+          type="button"
+          onClick={onViewWork}
+          data-testid="link-hero-cta"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          whileHover={{ gap: '1rem' }}
+          transition={{ duration: 0.8, delay: 1.3 }}
+          className="mt-10 flex items-center gap-3 rounded-sm border-b border-[hsl(var(--foreground)_/_0.4)] pb-1.5 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--foreground))] transition-colors hover:border-[hsl(var(--primary))] hover:text-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+        >
+          {lang === 'uk' ? 'Дивитись роботи' : 'View the work'}
+          <span aria-hidden>→</span>
+        </motion.button>
       </div>
 
       {/* Bottom descriptor */}
@@ -540,7 +624,7 @@ function HomePage({ t }: { t: typeof T['en'] }) {
 /* ------------------------------------------------------------------ */
 /* PROJECTS page                                                       */
 /* ------------------------------------------------------------------ */
-function ProjectCard({ t, onOpen }: { t: typeof T['en']; onOpen: () => void }) {
+function ProjectCard({ t, onOpen }: { t: Copy; onOpen: () => void }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
@@ -548,7 +632,8 @@ function ProjectCard({ t, onOpen }: { t: typeof T['en']; onOpen: () => void }) {
       onClick={onOpen}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative block w-full border-y border-[hsl(var(--border))] py-10 text-left md:py-14"
+      data-testid="link-project-mzshop"
+      className="group relative block w-full border-y border-[hsl(var(--border))] py-10 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-14"
     >
       <div className="flex flex-col gap-8 md:flex-row md:items-center md:gap-14">
         <div className="flex items-start gap-6 md:w-1/2">
@@ -621,7 +706,8 @@ function BotCard({ num, handle, tagUk, tagEn, titleUk, titleEn, descUk, descEn, 
       rel="noopener noreferrer"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative block border-b border-[hsl(var(--border))] py-8 md:py-10"
+      data-testid={`link-bot-${handle.replace('@', '')}`}
+      className="group relative block border-b border-[hsl(var(--border))] py-8 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-10"
     >
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-14">
         <div className="flex items-start gap-5 md:w-3/5">
@@ -663,7 +749,7 @@ function BotCard({ num, handle, tagUk, tagEn, titleUk, titleEn, descUk, descEn, 
   );
 }
 
-function ProjectsPage({ t, lang, onOpenCase }: { t: typeof T['en']; lang: Lang; onOpenCase: () => void }) {
+function ProjectsPage({ t, lang, onOpenCase }: { t: Copy; lang: Lang; onOpenCase: () => void }) {
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
@@ -759,7 +845,8 @@ function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-14 flex items-center gap-2 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))]"
+          data-testid="button-back-to-projects"
+          className="mb-14 flex items-center gap-2 rounded-sm font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
         >
           ← {isUk ? 'Назад до проєктів' : 'Back to projects'}
         </motion.button>
@@ -911,7 +998,7 @@ function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
 /* ------------------------------------------------------------------ */
 /* ABOUT page                                                          */
 /* ------------------------------------------------------------------ */
-function AboutPage({ t, onContact }: { t: typeof T['en']; onContact: () => void }) {
+function AboutPage({ t, onContact }: { t: Copy; onContact: () => void }) {
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
@@ -997,7 +1084,8 @@ function AboutPage({ t, onContact }: { t: typeof T['en']; onContact: () => void 
               onClick={onContact}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="mt-12 inline-flex items-center gap-3 border border-[hsl(var(--primary)_/_0.5)] px-6 py-3 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.08)]"
+              data-testid="link-about-contact-cta"
+              className="mt-12 inline-flex items-center gap-3 border border-[hsl(var(--primary)_/_0.5)] px-6 py-3 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.08)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
             >
               {t.orderBtn}
               <span aria-hidden>↓</span>
@@ -1016,6 +1104,8 @@ function BotOrderForm({ lang }: { lang: Lang }) {
   const isUk = lang === 'uk';
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
+  const [sendError, setSendError] = useState(false);
+  const [lastUrl, setLastUrl] = useState('');
   const [form, setForm] = useState({
     name: '', telegram: '', description: '', botType: '', deadline: '',
   });
@@ -1047,7 +1137,14 @@ function BotOrderForm({ lang }: { lang: Lang }) {
       features.length ? `⚙️ ${isUk ? 'Функції' : 'Features'}: ${features.join(', ')}` : '',
       form.deadline ? `⏱ ${isUk ? 'Дедлайн' : 'Deadline'}: ${form.deadline}` : '',
     ].filter(Boolean).join('\n');
-    window.open(`https://t.me/sefice?text=${encodeURIComponent(lines)}`, '_blank');
+    const tgUrl = `https://t.me/sefice?text=${encodeURIComponent(lines)}`;
+    const win = window.open(tgUrl, '_blank', 'noopener,noreferrer');
+    if (!win) {
+      setSendError(true);
+      setLastUrl(tgUrl);
+      return;
+    }
+    setSendError(false);
     setSent(true);
   };
 
@@ -1063,7 +1160,9 @@ function BotOrderForm({ lang }: { lang: Lang }) {
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className="group flex w-full items-center justify-between px-8 py-6 text-left"
+        data-testid="button-toggle-bot-order-form"
+        aria-expanded={open}
+        className="group flex w-full items-center justify-between px-8 py-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
       >
         <div>
           <p className="mb-1 font-sans text-[10px] uppercase tracking-[0.35em] text-[hsl(var(--primary)_/_0.7)]">
@@ -1096,8 +1195,37 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                   {isUk ? 'Відкрили Telegram — відправ повідомлення!' : 'Telegram opened — just hit send!'}
                 </p>
                 <button type="button" onClick={() => { setSent(false); setForm({ name: '', telegram: '', description: '', botType: '', deadline: '' }); setFeatures([]); }}
-                  className="mt-2 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] underline">
+                  data-testid="button-bot-order-again"
+                  className="mt-2 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]">
                   {isUk ? 'Нова заявка' : 'New request'}
+                </button>
+              </div>
+            ) : sendError ? (
+              <div className="flex flex-col items-center gap-4 px-8 pb-10 pt-4 text-center" role="alert" data-testid="text-bot-order-error">
+                <span className="text-4xl">⚠️</span>
+                <p className="font-serif text-xl italic text-[hsl(var(--foreground))]">
+                  {isUk ? 'Браузер заблокував спливаюче вікно' : 'Your browser blocked the pop-up'}
+                </p>
+                <p className="max-w-sm font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+                  {isUk ? 'Дані заявки збережено — просто відкрийте Telegram вручну.' : "Your request details are saved — just open Telegram manually."}
+                </p>
+                <a
+                  href={lastUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => { setSendError(false); setSent(true); }}
+                  data-testid="link-bot-order-fallback"
+                  className="mt-2 bg-[hsl(var(--primary))] px-6 py-3 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--background))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+                >
+                  {isUk ? 'Відкрити Telegram' : 'Open Telegram'}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setSendError(false)}
+                  data-testid="button-bot-order-error-back"
+                  className="font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))] underline"
+                >
+                  {isUk ? 'Повернутись до форми' : 'Back to the form'}
                 </button>
               </div>
             ) : (
@@ -1113,7 +1241,8 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                     value={form.name}
                     onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                     placeholder={isUk ? 'Як до вас звертатись' : 'What to call you'}
-                    className="border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                    data-testid="input-bot-name"
+                    className="border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] transition-colors"
                   />
                 </div>
 
@@ -1128,7 +1257,8 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                     value={form.telegram}
                     onChange={e => setForm(f => ({ ...f, telegram: e.target.value }))}
                     placeholder="@username"
-                    className="border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                    data-testid="input-bot-telegram"
+                    className="border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] transition-colors"
                   />
                 </div>
 
@@ -1140,7 +1270,8 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                   <select
                     value={form.botType}
                     onChange={e => setForm(f => ({ ...f, botType: e.target.value }))}
-                    className="border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                    data-testid="select-bot-type"
+                    className="border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary)_/_0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] transition-colors"
                   >
                     <option value="">{isUk ? 'Оберіть...' : 'Select...'}</option>
                     {botTypes.map(b => <option key={b} value={b}>{b}</option>)}
@@ -1155,7 +1286,8 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                   <select
                     value={form.deadline}
                     onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))}
-                    className="border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                    data-testid="select-bot-deadline"
+                    className="border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary)_/_0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] transition-colors"
                   >
                     <option value="">{isUk ? 'Не важливо' : 'Not important'}</option>
                     {deadlines.map(d => <option key={d} value={d}>{d}</option>)}
@@ -1175,7 +1307,8 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                     placeholder={isUk
                       ? 'Розкажіть про ваш бізнес, чого хочете від бота, які задачі він має вирішувати...'
                       : 'Tell me about your business, what you want the bot to do, what problems it should solve...'}
-                    className="resize-none border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] transition-colors"
+                    data-testid="input-bot-description"
+                    className="resize-none border border-[hsl(var(--border))] bg-transparent px-4 py-3 font-sans text-sm text-[hsl(var(--foreground))] outline-none placeholder:text-[hsl(var(--muted-foreground)_/_0.4)] focus:border-[hsl(var(--primary)_/_0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] transition-colors"
                   />
                 </div>
 
@@ -1190,7 +1323,9 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                         key={f}
                         type="button"
                         onClick={() => toggleFeature(f)}
-                        className={`border px-3 py-1.5 font-sans text-xs transition-colors ${
+                        aria-pressed={features.includes(f)}
+                        data-testid={`button-feature-${f}`}
+                        className={`border px-3 py-1.5 font-sans text-xs transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${
                           features.includes(f)
                             ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.1)] text-[hsl(var(--foreground))]'
                             : 'border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] hover:border-[hsl(var(--primary)_/_0.5)]'
@@ -1210,7 +1345,8 @@ function BotOrderForm({ lang }: { lang: Lang }) {
                     disabled={!isValid}
                     whileHover={isValid ? { scale: 1.03 } : {}}
                     whileTap={isValid ? { scale: 0.97 } : {}}
-                    className={`px-8 py-4 font-sans text-xs uppercase tracking-[0.3em] transition-colors ${
+                    data-testid="button-submit-bot-order"
+                    className={`px-8 py-4 font-sans text-xs uppercase tracking-[0.3em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${
                       isValid
                         ? 'bg-[hsl(var(--primary))] text-[hsl(var(--background))] cursor-pointer'
                         : 'border border-[hsl(var(--border))] text-[hsl(var(--muted-foreground)_/_0.4)] cursor-not-allowed'
@@ -1229,7 +1365,7 @@ function BotOrderForm({ lang }: { lang: Lang }) {
   );
 }
 
-function ServicesPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
+function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
   const [openService, setOpenService] = useState<string | null>(null);
 
   return (
@@ -1261,7 +1397,9 @@ function ServicesPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
               >
                 <button
                   onClick={() => setOpenService(isOpen ? null : svc.id)}
-                  className="group flex w-full items-center gap-5 py-6 text-left"
+                  aria-expanded={isOpen}
+                  data-testid={`button-service-${svc.id}`}
+                  className="group flex w-full items-center gap-5 py-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
                 >
                   <span className="shrink-0 font-serif italic text-2xl leading-none text-[hsl(var(--muted-foreground)_/_0.3)] group-hover:text-[hsl(var(--primary)_/_0.5)] transition-colors">
                     0{i + 1}
@@ -1313,7 +1451,7 @@ function ServicesPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
           </div>
           <div className="flex flex-col gap-6">
             <p className="font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))] max-w-sm">{t.ctaDesc}</p>
-            <a href="https://t.me/sefice" target="_blank" rel="noopener noreferrer">
+            <a href="https://t.me/sefice" target="_blank" rel="noopener noreferrer" data-testid="link-services-cta-telegram" className="inline-block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]">
               <motion.span
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -1335,7 +1473,7 @@ function ServicesPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
 /* ------------------------------------------------------------------ */
 /* CONTACT page                                                        */
 /* ------------------------------------------------------------------ */
-function ContactLinkRow({ href, label, sub }: { href: string; label: string; sub: string }) {
+function ContactLinkRow({ href, label, sub, testId }: { href: string; label: string; sub: string; testId: string }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
@@ -1344,7 +1482,8 @@ function ContactLinkRow({ href, label, sub }: { href: string; label: string; sub
       rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative block border-b border-[hsl(var(--border))] py-8 md:py-10"
+      data-testid={testId}
+      className="group relative block border-b border-[hsl(var(--border))] py-8 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-10"
     >
       <div className="flex items-baseline justify-between">
         <motion.span
@@ -1373,7 +1512,7 @@ function ContactLinkRow({ href, label, sub }: { href: string; label: string; sub
   );
 }
 
-function ContactPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
+function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
@@ -1414,8 +1553,8 @@ function ContactPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="border-t border-[hsl(var(--border))]">
-            <ContactLinkRow href="mailto:ht1makcv5@gmail.com" label="ht1makcv5@gmail.com" sub={t.emailSub} />
-            <ContactLinkRow href="https://t.me/sefice" label="@sefice" sub={t.tgSub} />
+            <ContactLinkRow href="mailto:ht1makcv5@gmail.com" label="ht1makcv5@gmail.com" sub={t.emailSub} testId="link-email" />
+            <ContactLinkRow href="https://t.me/sefice" label="@sefice" sub={t.tgSub} testId="link-telegram" />
           </div>
         </motion.div>
 
@@ -1431,15 +1570,14 @@ function ContactPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
           </p>
           <h2 className="font-serif italic leading-[0.9] text-[hsl(var(--foreground))]" style={{ fontSize: 'clamp(3rem, 8vw, 8rem)' }}>
             {t.ctaBig}
-          </h2>
-          <h2 className="font-serif italic leading-[0.9] text-[hsl(var(--muted-foreground)_/_0.5)]" style={{ fontSize: 'clamp(3rem, 8vw, 8rem)' }}>
-            {t.ctaBigSub}
+            <span className="block text-[hsl(var(--muted-foreground)_/_0.5)]">{t.ctaBigSub}</span>
           </h2>
           <a
             href="https://t.me/sefice"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-10 inline-block font-sans text-sm tracking-[0.25em] text-[hsl(var(--primary))] hover:opacity-80 transition-opacity"
+            data-testid="link-telegram-big-cta"
+            className="mt-10 inline-block rounded-sm font-sans text-sm tracking-[0.25em] text-[hsl(var(--primary))] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
           >
             @sefice
           </a>
@@ -1456,10 +1594,296 @@ function ContactPage({ t, lang }: { t: typeof T['en']; lang: Lang }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Global "Order a website" CTA + slide-out panel                      */
+/* ------------------------------------------------------------------ */
+function GlobalOrderCta({ lang }: { lang: Lang }) {
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const label = lang === 'uk' ? 'Замовити сайт' : 'Order a website';
+
+  return (
+    <>
+      <motion.button
+        ref={triggerRef}
+        onClick={() => setOpen(true)}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.96 }}
+        data-testid="button-order-site-global"
+        aria-haspopup="dialog"
+        className="fixed bottom-5 right-5 z-[70] border border-[hsl(var(--primary)_/_0.55)] bg-[hsl(var(--background)_/_0.9)] px-5 py-3 font-sans text-[11px] uppercase tracking-[0.22em] text-[hsl(var(--primary))] shadow-lg backdrop-blur-sm transition-colors hover:bg-[hsl(var(--primary)_/_0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:bottom-8 md:right-8 md:px-6 md:py-3.5"
+      >
+        {label}
+      </motion.button>
+      <AnimatePresence>
+        {open && (
+          <OrderSitePanel
+            lang={lang}
+            onClose={() => {
+              setOpen(false);
+              triggerRef.current?.focus();
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) {
+  const isUk = lang === 'uk';
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [sent, setSent] = useState(false);
+  const [sendError, setSendError] = useState(false);
+  const [lastUrl, setLastUrl] = useState('');
+  const [form, setForm] = useState({ name: '', contact: '', service: '', budget: '', message: '' });
+  const update = (key: keyof typeof form, value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  const services = isUk
+    ? ['Лендинг', 'Корпоративний сайт', 'Інтернет-магазин', 'UI/UX дизайн', 'Інше']
+    : ['Landing page', 'Corporate website', 'Online store', 'UI/UX design', 'Other'];
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && panelRef.current) {
+        const focusables = Array.from(
+          panelRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )
+        );
+        if (focusables.length === 0) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    panelRef.current?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [onClose]);
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    const name = form.name.trim();
+    const message = form.message.replace(/\s+/g, ' ').trim();
+    if (name.length < 2 || message.length < 5) return;
+    const lines = [
+      `🌐 ${isUk ? 'Замовлення сайту' : 'Website order'}`,
+      `👤 ${isUk ? 'Імʼя' : 'Name'}: ${name}`,
+      `📱 ${isUk ? 'Контакт' : 'Contact'}: ${form.contact.trim()}`,
+      form.service ? `🏷 ${isUk ? 'Послуга' : 'Service'}: ${form.service}` : '',
+      form.budget.trim() ? `💰 ${isUk ? 'Бюджет' : 'Budget'}: ${form.budget.trim()}` : '',
+      `📝 ${isUk ? 'Опис' : 'Message'}: ${message}`,
+    ].filter(Boolean).join('\n');
+    const tgUrl = `https://t.me/sefice?text=${encodeURIComponent(lines)}`;
+    const win = window.open(tgUrl, '_blank', 'noopener,noreferrer');
+    if (!win) {
+      setSendError(true);
+      setLastUrl(tgUrl);
+      return;
+    }
+    setSendError(false);
+    setSent(true);
+  };
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[95] flex justify-end bg-[hsl(var(--background)_/_0.72)] backdrop-blur-sm"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      onClick={onClose}
+    >
+      <motion.div
+        ref={panelRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="order-panel-title"
+        data-testid="dialog-order-panel"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="flex h-[100dvh] w-full max-w-md flex-col overflow-y-auto border-l border-[hsl(var(--border))] bg-[hsl(var(--background))] p-6 outline-none md:p-10"
+      >
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--primary))]">
+              {isUk ? 'Нове замовлення' : 'New order'}
+            </p>
+            <h2 id="order-panel-title" className="mt-2 font-serif text-3xl italic text-[hsl(var(--foreground))] md:text-4xl">
+              {isUk ? 'Замовити сайт' : 'Order a website'}
+            </h2>
+          </div>
+          <button
+            onClick={onClose}
+            data-testid="button-close-order-panel"
+            aria-label={isUk ? 'Закрити' : 'Close'}
+            className="rounded-full border border-[hsl(var(--border))] p-3 text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[hsl(var(--primary))]"
+          >
+            ✕
+          </button>
+        </div>
+
+        {sent ? (
+          <div className="flex flex-1 flex-col justify-center py-8" data-testid="text-order-sent">
+            <p className="font-serif text-3xl italic text-[hsl(var(--foreground))]">
+              {isUk ? 'Telegram відкрито — надішліть повідомлення!' : 'Telegram opened — just hit send!'}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+              {isUk ? 'Якщо вікно не відкрилось, напишіть напряму: @sefice' : "If it didn't open, message directly: @sefice"}
+            </p>
+            <button
+              onClick={() => {
+                setSent(false);
+                setForm({ name: '', contact: '', service: '', budget: '', message: '' });
+              }}
+              data-testid="button-order-again"
+              className="mt-8 w-fit border-b border-[hsl(var(--foreground))] pb-1 text-sm hover:text-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+            >
+              {isUk ? 'Надіслати ще одну заявку' : 'Send another request'}
+            </button>
+          </div>
+        ) : sendError ? (
+          <div className="flex flex-1 flex-col justify-center py-8" data-testid="text-order-error" role="alert">
+            <p className="font-serif text-2xl italic text-[hsl(var(--foreground))]">
+              {isUk ? 'Браузер заблокував спливаюче вікно' : 'Your browser blocked the pop-up'}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+              {isUk
+                ? 'Ваші дані нікуди не зникли — просто натисніть кнопку нижче, щоб відкрити Telegram вручну.'
+                : "Your details weren't lost — just tap the button below to open Telegram manually."}
+            </p>
+            <a
+              href={lastUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                setSendError(false);
+                setSent(true);
+              }}
+              data-testid="link-order-fallback"
+              className="mt-8 inline-flex w-fit items-center gap-3 border border-[hsl(var(--primary)_/_0.6)] bg-[hsl(var(--primary)_/_0.1)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+            >
+              {isUk ? 'Відкрити Telegram' : 'Open Telegram'}
+            </a>
+            <button
+              type="button"
+              onClick={() => setSendError(false)}
+              data-testid="button-order-error-back"
+              className="mt-4 w-fit text-xs uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] underline hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+            >
+              {isUk ? 'Повернутись до форми' : 'Back to the form'}
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <label className="block">
+              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? "Ваше ім'я" : 'Your name'}</span>
+              <input
+                required
+                minLength={2}
+                value={form.name}
+                onChange={(e) => update('name', e.target.value)}
+                data-testid="input-panel-name"
+                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">
+                {isUk ? 'Телефон, Telegram або email' : 'Phone, Telegram, or email'}
+              </span>
+              <input
+                required
+                minLength={3}
+                value={form.contact}
+                onChange={(e) => update('contact', e.target.value)}
+                data-testid="input-panel-contact"
+                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? 'Що потрібно зробити' : 'What do you need'}</span>
+              <select
+                value={form.service}
+                onChange={(e) => update('service', e.target.value)}
+                data-testid="select-panel-service"
+                className="w-full border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+              >
+                <option value="">{isUk ? 'Оберіть послугу' : 'Choose a service'}</option>
+                {services.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? 'Орієнтовний бюджет' : 'Rough budget'}</span>
+              <input
+                value={form.budget}
+                onChange={(e) => update('budget', e.target.value)}
+                data-testid="input-panel-budget"
+                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? 'Коротко про завдання' : 'Briefly about the task'}</span>
+              <textarea
+                required
+                minLength={5}
+                rows={4}
+                value={form.message}
+                onChange={(e) => update('message', e.target.value)}
+                data-testid="input-panel-message"
+                className="w-full resize-none border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+              />
+            </label>
+            <button
+              type="submit"
+              data-testid="button-panel-submit"
+              className="mt-2 w-full border border-[hsl(var(--primary)_/_0.6)] bg-[hsl(var(--primary)_/_0.1)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+            >
+              {isUk ? 'Відправити в Telegram' : 'Send via Telegram'}
+            </button>
+          </form>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* URL <-> Page mapping (so direct links and refresh work correctly)   */
+/* ------------------------------------------------------------------ */
+const PAGE_SLUGS: readonly Page[] = ['home', 'projects', 'about', 'services', 'contact', 'case-mzshop'];
+
+function pageFromLocation(location: string): Page {
+  const slug = location.replace(/^\/+/, '');
+  return (PAGE_SLUGS as readonly string[]).includes(slug) ? (slug as Page) : 'home';
+}
+
+/* ------------------------------------------------------------------ */
 /* Page root                                                           */
 /* ------------------------------------------------------------------ */
 export default function Portfolio() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [location, setLocation] = useLocation();
+  const currentPage = pageFromLocation(location);
   const [savedLang, setSavedLang] = useState<Lang>(() => {
     try {
       const saved = localStorage.getItem('boohx-lang');
@@ -1478,7 +1902,7 @@ export default function Portfolio() {
   };
 
   const navigate = (page: Page) => {
-    setCurrentPage(page);
+    setLocation(page === 'home' ? '/' : `/${page}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -1495,10 +1919,12 @@ export default function Portfolio() {
 
       <CursorGlow />
 
+      <GlobalOrderCta lang={savedLang} />
+
       <AnimatePresence mode="wait">
         {currentPage === 'home' && (
           <PageWrap pageKey="home">
-            <HomePage t={t} />
+            <HomePage t={t} lang={savedLang} onViewWork={() => navigate('projects')} />
           </PageWrap>
         )}
         {currentPage === 'projects' && (
