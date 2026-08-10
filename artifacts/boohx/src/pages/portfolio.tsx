@@ -1,19 +1,10 @@
-import { lazy, Suspense, useEffect, useRef, useState, Component } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { ReactNode, FormEvent } from 'react';
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import Lenis from 'lenis';
 
-const GhostScene = lazy(() => import('@/components/GhostScene'));
-
-/* ------------------------------------------------------------------ */
-/* WebGL error boundary                                                */
-/* ------------------------------------------------------------------ */
-class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
-  render() { return this.state.failed ? null : this.props.children; }
-}
+const MiniGhost = lazy(() => import('@/components/MiniGhost'));
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -521,30 +512,18 @@ function HomePage({ t, lang, onViewWork }: { t: Copy; lang: Lang; onViewWork: ()
         <div className="noise-overlay absolute inset-0 opacity-[0.035]" />
       </div>
 
-      {/* Ghost — bottom-left */}
+      {/* Mini ghost — faceless, small, right side */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute bottom-0 left-0 z-0"
-        initial={{ opacity: 0, x: -60 }}
-        animate={{ opacity: 1, x: 0 }}
+        className="pointer-events-none absolute right-[4%] top-[18%] z-0 md:right-[8%]"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div
-          className="relative overflow-visible"
-          style={{ width: 'clamp(300px, 50vw, 760px)', height: 'clamp(320px, 78vh, 860px)' }}
-        >
-          <div
-            className="pointer-events-none absolute inset-0 -z-10 rounded-full"
-            style={{
-              background: 'radial-gradient(ellipse 70% 60% at 45% 65%, rgba(90,72,255,0.22) 0%, rgba(60,40,200,0.08) 50%, transparent 75%)',
-              transform: 'translateX(-8%) translateY(5%)',
-            }}
-          />
-          <WebGLBoundary>
-            <Suspense fallback={null}>
-              <GhostScene />
-            </Suspense>
-          </WebGLBoundary>
+        <div style={{ width: 'clamp(48px, 6vw, 88px)' }}>
+          <Suspense fallback={null}>
+            <MiniGhost />
+          </Suspense>
         </div>
       </motion.div>
 
