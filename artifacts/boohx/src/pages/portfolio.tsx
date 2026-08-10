@@ -5,6 +5,7 @@ import { useLocation } from 'wouter';
 import Lenis from 'lenis';
 
 const MiniGhost = lazy(() => import('@/components/MiniGhost'));
+const AmbientSparkles = lazy(() => import('@/components/AmbientSparkles'));
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -613,7 +614,7 @@ function ProjectCard({ t, onOpen }: { t: Copy; onOpen: () => void }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       data-testid="link-project-mzshop"
-      className="group relative block w-full border-y border-[hsl(var(--border))] py-10 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-14"
+      className="group relative block w-full border-y border-[hsl(var(--border))] py-10 text-left transition-shadow duration-500 hover:shadow-[0_0_60px_-14px_hsl(var(--primary)_/_0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-14"
     >
       <div className="flex flex-col gap-8 md:flex-row md:items-center md:gap-14">
         <div className="flex items-start gap-6 md:w-1/2">
@@ -687,7 +688,7 @@ function BotCard({ num, handle, tagUk, tagEn, titleUk, titleEn, descUk, descEn, 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       data-testid={`link-bot-${handle.replace('@', '')}`}
-      className="group relative block border-b border-[hsl(var(--border))] py-8 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-10"
+      className="group relative block border-b border-[hsl(var(--border))] py-8 transition-shadow duration-500 hover:shadow-[0_0_50px_-16px_hsl(var(--primary)_/_0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-10"
     >
       <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-14">
         <div className="flex items-start gap-5 md:w-3/5">
@@ -953,7 +954,7 @@ function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="mt-20 border-t border-[hsl(var(--border))] pt-10 md:mt-28"
+          className="divider-gradient mt-20 pt-10 md:mt-28"
         >
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {[
@@ -1039,7 +1040,7 @@ function AboutPage({ t, onContact }: { t: Copy; onContact: () => void }) {
             </div>
 
             {/* How it works */}
-            <div className="mt-16 border-t border-[hsl(var(--border))] pt-12">
+            <div className="divider-gradient mt-16 pt-12">
               <p className="mb-10 font-sans text-xs uppercase tracking-[0.4em] text-[hsl(var(--muted-foreground))]">{t.howItWorks}</p>
               <div className="grid grid-cols-1 gap-y-8 md:grid-cols-5 md:gap-x-6">
                 {t.howSteps.map((s, i) => (
@@ -1373,7 +1374,7 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: 0.06 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-                className="border-b border-[hsl(var(--border))]"
+                className="border-b border-[hsl(var(--border))] transition-shadow duration-500 hover:shadow-[0_0_45px_-18px_hsl(var(--primary)_/_0.4)]"
               >
                 <button
                   onClick={() => setOpenService(isOpen ? null : svc.id)}
@@ -1532,7 +1533,7 @@ function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="border-t border-[hsl(var(--border))]">
+          <div className="divider-gradient">
             <ContactLinkRow href="mailto:ht1makcv5@gmail.com" label="ht1makcv5@gmail.com" sub={t.emailSub} testId="link-email" />
             <ContactLinkRow href="https://t.me/sefice" label="@sefice" sub={t.tgSub} testId="link-telegram" />
           </div>
@@ -1564,7 +1565,7 @@ function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
         </motion.div>
 
         {/* Footer */}
-        <div className="mt-20 border-t border-[hsl(var(--border))] pt-8 flex justify-between items-center">
+        <div className="divider-gradient mt-20 pt-8 flex justify-between items-center">
           <span className="font-sans text-[11px] uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">{t.footerYear}</span>
           <span className="font-serif text-lg italic text-[hsl(var(--muted-foreground)_/_0.4)]">boohx</span>
         </div>
@@ -1786,7 +1787,7 @@ function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) 
                 value={form.name}
                 onChange={(e) => update('name', e.target.value)}
                 data-testid="input-panel-name"
-                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               />
             </label>
             <label className="block">
@@ -1799,7 +1800,7 @@ function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) 
                 value={form.contact}
                 onChange={(e) => update('contact', e.target.value)}
                 data-testid="input-panel-contact"
-                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               />
             </label>
             <label className="block">
@@ -1808,7 +1809,7 @@ function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) 
                 value={form.service}
                 onChange={(e) => update('service', e.target.value)}
                 data-testid="select-panel-service"
-                className="w-full border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+                className="w-full border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               >
                 <option value="">{isUk ? 'Оберіть послугу' : 'Choose a service'}</option>
                 {services.map((s) => (
@@ -1822,7 +1823,7 @@ function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) 
                 value={form.budget}
                 onChange={(e) => update('budget', e.target.value)}
                 data-testid="input-panel-budget"
-                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               />
             </label>
             <label className="block">
@@ -1834,7 +1835,7 @@ function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) 
                 value={form.message}
                 onChange={(e) => update('message', e.target.value)}
                 data-testid="input-panel-message"
-                className="w-full resize-none border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))]focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+                className="w-full resize-none border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               />
             </label>
             <button
@@ -1921,6 +1922,11 @@ export default function Portfolio() {
       />
 
       <CursorGlow />
+
+      <div className="grid-overlay pointer-events-none fixed inset-0 z-0" aria-hidden />
+      <Suspense fallback={null}>
+        <AmbientSparkles />
+      </Suspense>
 
       <GlobalOrderCta lang={savedLang} />
 
