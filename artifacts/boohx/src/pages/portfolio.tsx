@@ -132,6 +132,110 @@ const T: Record<Lang, Copy> = {
 /* ------------------------------------------------------------------ */
 /* Services data                                                       */
 /* ------------------------------------------------------------------ */
+const PRICING_TIERS = [
+  {
+    id: 'mini',
+    price: '2 000 ₴',
+    recommended: false,
+    uk: {
+      name: 'Міні',
+      items: ['Односторінковий сайт (лендінг) без бота', 'Розміщення на безкоштовній платформі'],
+    },
+    en: {
+      name: 'Mini',
+      items: ['One-page landing site, no bot', 'Hosted on a free platform'],
+    },
+  },
+  {
+    id: 'basic',
+    price: '3 500 ₴',
+    recommended: false,
+    uk: {
+      name: 'Базовий',
+      items: [
+        'Повна розробка сайту (поточну версію макета вже можна дивитись)',
+        'Запуск та налаштування одного головного Telegram-бота',
+        'Розміщення на безкоштовній платформі — без щомісячної плати за сервери',
+      ],
+    },
+    en: {
+      name: 'Basic',
+      items: [
+        'Full website build (current mockup already viewable)',
+        'Launch and setup of one main Telegram bot',
+        'Hosted on a free platform — no monthly server fees',
+      ],
+    },
+  },
+  {
+    id: 'optimal',
+    price: '4 500 ₴',
+    recommended: true,
+    uk: {
+      name: 'Оптимальний',
+      items: [
+        'Повна розробка сайту + фінальні правки під побажання',
+        'Запуск і синхронізація обох Telegram-ботів окремо',
+        'Стабільна робота без щомісячних абонплат за хостинг',
+        'Базове тестування системи перед фінальною здачею',
+      ],
+    },
+    en: {
+      name: 'Optimal',
+      items: [
+        'Full website build + final revisions to your requests',
+        'Launch and sync of both Telegram bots separately',
+        'Stable setup with no monthly hosting fees',
+        'Basic QA testing before final handoff',
+      ],
+    },
+  },
+  {
+    id: 'max',
+    price: '6 500 ₴',
+    recommended: false,
+    uk: {
+      name: 'Максимум',
+      items: [
+        'Усе, що в тарифі «Оптимальний»',
+        'Розміщення на окремому виділеному сервері (VPS) для швидкості та стабільності 24/7',
+        '1 місяць технічної підтримки після запуску',
+      ],
+    },
+    en: {
+      name: 'Max',
+      items: [
+        'Everything in the Optimal tier',
+        'Deployed on a dedicated VPS for 24/7 speed and stability',
+        '1 month of technical support after launch',
+      ],
+    },
+  },
+  {
+    id: 'premium',
+    price: '9 000 ₴',
+    recommended: false,
+    uk: {
+      name: 'Преміум',
+      items: [
+        'Усе, що в тарифі «Максимум»',
+        '3 місяці технічної підтримки замість одного',
+        'Один додатковий раунд дизайн-правок після запуску',
+        'Пріоритетна відповідь на звернення',
+      ],
+    },
+    en: {
+      name: 'Premium',
+      items: [
+        'Everything in the Max tier',
+        '3 months of support instead of 1',
+        'One extra round of design tweaks after launch',
+        'Priority response on requests',
+      ],
+    },
+  },
+];
+
 const SERVICES = [
   {
     id: 'landing',
@@ -1417,6 +1521,55 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
               </motion.div>
             );
           })}
+        </div>
+
+        {/* Pricing tiers */}
+        <div className="divider-gradient mt-20 pt-14">
+          <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.4em] text-[hsl(var(--muted-foreground))]">
+            {lang === 'uk' ? 'ОРІЄНТОВНІ ТАРИФИ' : 'SAMPLE PRICING'}
+          </p>
+          <h2 className="font-serif text-3xl italic text-[hsl(var(--foreground))] md:text-4xl">
+            {lang === 'uk' ? 'Оберіть варіант співпраці' : 'Pick a way to work together'}
+          </h2>
+          <p className="mt-3 max-w-lg font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+            {lang === 'uk'
+              ? 'Орієнтир на прикладі задачі «сайт + Telegram-боти». Реальна вартість завжди узгоджується під конкретний проєкт.'
+              : 'Based on a "website + Telegram bots" example project. Final pricing is always confirmed per project.'}
+          </p>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+            {PRICING_TIERS.map((tier, i) => {
+              const p = tier[lang];
+              return (
+                <motion.div
+                  key={tier.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
+                  data-testid={`card-pricing-${tier.id}`}
+                  className={`relative flex flex-col border p-6 transition-shadow duration-500 hover:shadow-[0_0_50px_-18px_hsl(var(--primary)_/_0.5)] ${
+                    tier.recommended ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.06)]' : 'border-[hsl(var(--border))]'
+                  }`}
+                >
+                  {tier.recommended && (
+                    <span className="absolute -top-3 left-6 bg-[hsl(var(--primary))] px-3 py-1 font-sans text-[10px] uppercase tracking-[0.2em] text-[hsl(var(--primary-foreground))]">
+                      {lang === 'uk' ? 'Рекомендую' : 'Recommended'}
+                    </span>
+                  )}
+                  <h3 className="font-serif text-xl italic text-[hsl(var(--foreground))]">{p.name}</h3>
+                  <p className="mt-2 font-sans text-2xl font-semibold text-[hsl(var(--primary))]">{tier.price}</p>
+                  <ul className="mt-5 flex-1 space-y-2.5">
+                    {p.items.map((item) => (
+                      <li key={item} className="flex gap-2 font-sans text-xs leading-relaxed text-[hsl(var(--muted-foreground))]">
+                        <span className="mt-1 text-[hsl(var(--primary))]" aria-hidden>✓</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
 
         <BotOrderForm lang={lang} />
