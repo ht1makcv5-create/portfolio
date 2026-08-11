@@ -6,6 +6,7 @@ import Lenis from 'lenis';
 
 const MiniGhost = lazy(() => import('@/components/MiniGhost'));
 const AmbientSparkles = lazy(() => import('@/components/AmbientSparkles'));
+const OrderWizard = lazy(() => import('@/components/OrderWizard'));
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -390,6 +391,7 @@ function TopNav({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems: { page: Page; label: string }[] = [
+    { page: 'home', label: lang === 'uk' ? 'Головна' : 'Home' },
     { page: 'projects', label: lang === 'uk' ? 'Проєкти' : 'Projects' },
     { page: 'about', label: lang === 'uk' ? 'Про мене' : 'About' },
     { page: 'services', label: lang === 'uk' ? 'Послуги' : 'Services' },
@@ -1539,7 +1541,7 @@ function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
           </div>
         </motion.div>
 
-        {/* Big CTA */}
+        {/* Order wizard */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1549,19 +1551,16 @@ function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
           <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.5em] text-[hsl(var(--primary))]">
             {lang === 'uk' ? 'ГОТОВІ ПОЧАТИ?' : 'READY TO START?'}
           </p>
-          <h2 className="font-serif italic leading-[0.9] text-[hsl(var(--foreground))]" style={{ fontSize: 'clamp(3rem, 8vw, 8rem)' }}>
-            {t.ctaBig}
-            <span className="block text-[hsl(var(--muted-foreground)_/_0.5)]">{t.ctaBigSub}</span>
+          <h2 className="font-serif italic leading-[0.9] text-[hsl(var(--foreground))]" style={{ fontSize: 'clamp(2.6rem, 7vw, 6rem)' }}>
+            {lang === 'uk' ? 'Замовити' : 'Order a'}
+            <span className="block text-[hsl(var(--primary))]">{lang === 'uk' ? 'сайт під ключ' : 'website, start to finish'}</span>
           </h2>
-          <a
-            href="https://t.me/sefice"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-testid="link-telegram-big-cta"
-            className="mt-10 inline-block rounded-sm font-sans text-sm tracking-[0.25em] text-[hsl(var(--primary))] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-          >
-            @sefice
-          </a>
+
+          <div className="mt-16">
+            <Suspense fallback={null}>
+              <OrderWizard lang={lang} />
+            </Suspense>
+          </div>
         </motion.div>
 
         {/* Footer */}
