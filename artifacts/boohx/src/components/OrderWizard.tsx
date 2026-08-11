@@ -12,8 +12,8 @@ const SERVICE_OPTIONS_EN = ['Landing page', 'Corporate site', 'Online store', 'U
 const PACKAGE_OPTIONS_UK = ['Базовий', 'Професійний', 'Максимальний'];
 const PACKAGE_OPTIONS_EN = ['Basic', 'Professional', 'Full-scope'];
 
-const BUDGET_OPTIONS_UK = ['до 10 000 ₴', '10 000 – 25 000 ₴', '25 000 – 50 000 ₴', '50 000 ₴+'];
-const BUDGET_OPTIONS_EN = ['up to ₴10,000', '₴10,000 – 25,000', '₴25,000 – 50,000', '₴50,000+'];
+const BUDGET_OPTIONS_UK = ['до 1 000 ₴', '1 000 – 2 500 ₴', '2 500 – 5 000 ₴', '5 000 ₴+'];
+const BUDGET_OPTIONS_EN = ['up to ₴1,000', '₴1,000 – 2,500', '₴2,500 – 5,000', '₴5,000+'];
 
 interface WizardState {
   service: string;
