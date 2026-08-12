@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { ReactNode, FormEvent } from 'react';
-import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import Lenis from 'lenis';
 
@@ -1472,6 +1472,13 @@ function BotOrderForm({ lang }: { lang: Lang }) {
 
 function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
   const [openService, setOpenService] = useState<string | null>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const { scrollYProgress } = useScroll({ target: railRef, offset: ['start center', 'end center'] });
+  useMotionValueEvent(scrollYProgress, 'change', (v) => {
+    const idx = Math.round(v * (SERVICES.length - 1));
+    setActiveIdx(Math.min(SERVICES.length - 1, Math.max(0, idx)));
+  });
 
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
@@ -1528,11 +1535,31 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
           <span className="h-px flex-1 bg-[hsl(var(--border))]" />
         </motion.div>
 
-        <div className="flex flex-col">
-          {SERVICES.map((svc, i) => {
-            const s = svc[lang];
-            const isOpen = openService === svc.id;
-            return (
+        <div className="grid gap-8 md:grid-cols-[28px_1fr]">
+          {/* Scroll-progress gauge rail */}
+          <div className="relative hidden md:block" aria-hidden>
+            <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-[hsl(var(--border))]" />
+            {SERVICES.map((svc, i) => (
+              <div
+                key={svc.id}
+                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-500 ease-out"
+                style={{
+                  top: `${(i / (SERVICES.length - 1)) * 100}%`,
+                  width: activeIdx === i ? 12 : 7,
+                  height: activeIdx === i ? 12 : 7,
+                  background: activeIdx === i ? 'hsl(270 75% 68%)' : 'transparent',
+                  border: activeIdx === i ? 'none' : '1px solid hsl(var(--border))',
+                  boxShadow: activeIdx === i ? '0 0 18px 3px hsl(270 75% 68% / 0.55)' : 'none',
+                }}
+              />
+            ))}
+          </div>
+
+          <div ref={railRef} className="flex flex-col">
+            {SERVICES.map((svc, i) => {
+              const s = svc[lang];
+              const isOpen = openService === svc.id;
+              return (
               <motion.div
                 key={svc.id}
                 initial={{ opacity: 0, y: 16 }}
@@ -1578,7 +1605,8 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
                 </AnimatePresence>
               </motion.div>
             );
-          })}
+            })}
+          </div>
         </div>
 
         {/* Pricing tiers */}
