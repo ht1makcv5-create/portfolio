@@ -33,11 +33,12 @@ const EMPTY_STATE: WizardState = {
 export default function OrderWizard({ lang }: { lang: Lang }) {
   const isUk = lang === 'uk';
   const [step, setStep] = useState(0);
+  const [maxReached, setMaxReached] = useState(0);
   const [dir, setDir] = useState(1);
   const [data, setData] = useState<WizardState>(EMPTY_STATE);
   const [sent, setSent] = useState(false);
   const [sendError, setSendError] = useState(false);
-  const [lastUrl, setLastUrl] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [attempted, setAttempted] = useState(false);
 
   const set = <K extends keyof WizardState>(key: K, value: WizardState[K]) =>
@@ -54,8 +55,16 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
   const budgets = isUk ? BUDGET_OPTIONS_UK : BUDGET_OPTIONS_EN;
 
   const goto = (n: number) => {
-    setDir(n > step ? 1 : -1);
-    setStep(Math.max(0, Math.min(3, n)));
+    const target = Math.max(0, Math.min(maxReached, n));
+    setDir(target > step ? 1 : -1);
+    setStep(target);
+  };
+
+  const advanceNext = () => {
+    const target = Math.min(3, step + 1);
+    setDir(1);
+    setStep(target);
+    setMaxReached((m) => Math.max(m, target));
   };
 
   const buildMessage = () => {
@@ -73,22 +82,34 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
     return lines.join('\n');
   };
 
-  const submit = (e?: FormEvent) => {
+  const submit = async (e?: FormEvent) => {
     e?.preventDefault();
     setAttempted(true);
     if (data.name.trim().length < 2 || data.phone.trim().length < 5) {
       goto(3);
       return;
     }
-    const url = `https://t.me/sefice?text=${encodeURIComponent(buildMessage())}`;
-    const win = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!win) {
-      setSendError(true);
-      setLastUrl(url);
-      return;
-    }
+    setSubmitting(true);
     setSendError(false);
-    setSent(true);
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: '76085407-b2e5-4de6-a081-8ec4286ab339',
+          subject: isUk ? `Заявка на сайт від ${data.name.trim()}` : `Website inquiry from ${data.name.trim()}`,
+          from_name: data.name.trim(),
+          message: buildMessage(),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error('web3forms failed');
+      setSent(true);
+    } catch {
+      setSendError(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const cardBase =
@@ -99,13 +120,13 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
     return (
       <div className="rounded-sm border border-[hsl(var(--border))] p-10 text-center" data-testid="text-wizard-sent">
         <p className="font-serif text-3xl italic text-[hsl(var(--foreground))]">
-          {isUk ? 'Telegram відкрито — надішли повідомлення!' : 'Telegram opened — hit send!'}
+          {isUk ? 'Заявку надіслано!' : 'Request sent!'}
         </p>
         <p className="mt-3 text-sm text-[hsl(var(--muted-foreground))]">
-          {isUk ? 'Якщо вікно не відкрилось, напиши напряму: @sefice' : "If it didn't open, message directly: @sefice"}
+          {isUk ? 'Лист прийшов мені на пошту, відповім найближчим часом.' : "The email landed in my inbox — I'll get back to you soon."}
         </p>
         <button
-          onClick={() => { setSent(false); setData(EMPTY_STATE); setStep(0); setAttempted(false); }}
+          onClick={() => { setSent(false); setData(EMPTY_STATE); setStep(0); setMaxReached(0); setAttempted(false); }}
           data-testid="button-wizard-again"
           className="mt-6 border-b border-[hsl(var(--foreground))] pb-1 text-sm hover:text-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
         >
@@ -119,21 +140,19 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
     return (
       <div className="rounded-sm border border-[hsl(var(--border))] p-10 text-center" role="alert" data-testid="text-wizard-error">
         <p className="font-serif text-2xl italic text-[hsl(var(--foreground))]">
-          {isUk ? 'Браузер заблокував спливаюче вікно' : 'Your browser blocked the pop-up'}
+          {isUk ? 'Не вдалося надіслати' : "Couldn't send"}
         </p>
         <p className="mt-3 text-sm text-[hsl(var(--muted-foreground))]">
-          {isUk ? 'Дані заявки збережені — просто відкрий Telegram вручну.' : 'Your details are saved — just open Telegram manually.'}
+          {isUk ? 'Дані заявки збережені — спробуй ще раз, або напиши напряму: ht1makcv5@gmail.com чи @sefice.' : 'Your details are saved — try again, or reach out directly: ht1makcv5@gmail.com or @sefice.'}
         </p>
-        <a
-          href={lastUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => { setSendError(false); setSent(true); }}
-          data-testid="link-wizard-fallback"
-          className="mt-6 inline-block border border-[hsl(var(--primary)_/_0.6)] bg-[hsl(var(--primary)_/_0.1)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+        <button
+          type="button"
+          onClick={() => submit()}
+          data-testid="button-wizard-retry"
+          className="mt-6 border border-[hsl(var(--primary)_/_0.6)] bg-[hsl(var(--primary)_/_0.1)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
         >
-          {isUk ? 'Відкрити Telegram' : 'Open Telegram'}
-        </a>
+          {isUk ? 'Спробувати ще раз' : 'Try again'}
+        </button>
       </div>
     );
   }
@@ -148,13 +167,16 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
         </p>
         <div className="mt-6 divide-y divide-[hsl(var(--border))] border-t border-[hsl(var(--border))]">
           {steps.map((label, i) => (
-            <button
+            <motion.button
               key={label}
               type="button"
               onClick={() => goto(i)}
+              disabled={i > maxReached}
+              whileHover={i <= maxReached ? { x: 2 } : {}}
+              whileTap={i <= maxReached ? { scale: 0.98 } : {}}
               data-testid={`button-wizard-step-${i}`}
               className={`flex w-full items-center justify-between py-3 text-left text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${
-                i === step ? 'text-[hsl(var(--foreground))]' : 'text-[hsl(var(--muted-foreground))]'
+                i === step ? 'text-[hsl(var(--foreground))]' : i > maxReached ? 'text-[hsl(var(--muted-foreground)_/_0.35)] cursor-default' : 'text-[hsl(var(--muted-foreground))]'
               }`}
             >
               <span>
@@ -162,7 +184,7 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
                 {label}
               </span>
               {summaries[i] && <span className="ml-2 truncate text-xs text-[hsl(var(--primary))]">{summaries[i]}</span>}
-            </button>
+            </motion.button>
           ))}
         </div>
         <p className="mt-6 flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
@@ -192,24 +214,28 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
                 </p>
                 <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3">
                   {services.map((s) => (
-                    <button
+                    <motion.button
                       key={s}
                       type="button"
                       onClick={() => set('service', s)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
                       data-testid={`button-wizard-service-${s}`}
                       className={`${cardBase} ${data.service === s ? cardActive : ''}`}
                     >
                       {s}
-                    </button>
+                    </motion.button>
                   ))}
-                  <button
+                  <motion.button
                     type="button"
                     onClick={() => set('service', isUk ? 'Ще не визначився' : 'Not sure yet')}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
                     data-testid="button-wizard-service-unsure"
                     className={`${cardBase} col-span-2 md:col-span-3 ${data.service.includes(isUk ? 'не визначився' : 'Not sure') ? cardActive : ''}`}
                   >
                     {isUk ? 'Ще не визначився' : 'Not sure yet'}
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             )}
@@ -224,25 +250,29 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
                 </p>
                 <div className="mt-8 grid grid-cols-3 gap-3">
                   {packages.map((p) => (
-                    <button
+                    <motion.button
                       key={p}
                       type="button"
                       onClick={() => set('pkg', p)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
                       data-testid={`button-wizard-package-${p}`}
                       className={`${cardBase} ${data.pkg === p ? cardActive : ''}`}
                     >
                       {p}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
-                <button
+                <motion.button
                   type="button"
                   onClick={() => set('pkg', isUk ? 'Ще не знаю' : 'Not sure')}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
                   data-testid="button-wizard-package-unsure"
                   className={`${cardBase} mt-3 block w-full ${data.pkg === (isUk ? 'Ще не знаю' : 'Not sure') ? cardActive : ''}`}
                 >
                   {isUk ? 'Ще не знаю' : 'Not sure'}
-                </button>
+                </motion.button>
 
                 <AnimatePresence>
                   {data.pkg && (
@@ -257,25 +287,29 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
                       </h5>
                       <div className="mt-4 grid grid-cols-2 gap-3">
                         {budgets.map((b) => (
-                          <button
+                          <motion.button
                             key={b}
                             type="button"
                             onClick={() => set('budget', b)}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.97 }}
                             data-testid={`button-wizard-budget-${b}`}
                             className={`${cardBase} ${data.budget === b ? cardActive : ''}`}
                           >
                             {b}
-                          </button>
+                          </motion.button>
                         ))}
                       </div>
-                      <button
+                      <motion.button
                         type="button"
                         onClick={() => set('budget', isUk ? 'Поки не визначився' : 'Not sure yet')}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
                         data-testid="button-wizard-budget-unsure"
                         className={`${cardBase} mt-3 block w-full ${data.budget === (isUk ? 'Поки не визначився' : 'Not sure yet') ? cardActive : ''}`}
                       >
                         {isUk ? 'Поки не визначився' : 'Not sure yet'}
-                      </button>
+                      </motion.button>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -366,33 +400,40 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
 
         {/* Nav buttons */}
         <div className="mt-10 flex items-center justify-between gap-4">
-          <button
+          <motion.button
             type="button"
             onClick={() => goto(step - 1)}
             disabled={step === 0}
+            whileHover={step > 0 ? { x: -2 } : {}}
+            whileTap={step > 0 ? { scale: 0.96 } : {}}
             data-testid="button-wizard-back"
             className="font-sans text-xs uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] disabled:opacity-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
           >
             ← {isUk ? 'Назад' : 'Back'}
-          </button>
+          </motion.button>
           <div className="flex items-center gap-3">
             {step < 3 && (
-              <button
+              <motion.button
                 type="button"
-                onClick={() => goto(step + 1)}
+                onClick={advanceNext}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.96 }}
                 data-testid="button-wizard-next"
                 className="border border-[hsl(var(--border))] px-6 py-3 font-sans text-xs uppercase tracking-[0.25em] text-[hsl(var(--foreground))] transition-colors hover:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
               >
                 {isUk ? 'Далі' : 'Next'} →
-              </button>
+              </motion.button>
             )}
-            <button
+            <motion.button
               type="submit"
+              disabled={submitting}
+              whileHover={submitting ? {} : { scale: 1.03 }}
+              whileTap={submitting ? {} : { scale: 0.96 }}
               data-testid="button-wizard-submit"
-              className="bg-[hsl(var(--primary))] px-6 py-3 font-sans text-xs uppercase tracking-[0.25em] text-[hsl(var(--primary-foreground))] transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+              className="bg-[hsl(var(--primary))] px-6 py-3 font-sans text-xs uppercase tracking-[0.25em] text-[hsl(var(--primary-foreground))] transition-opacity hover:opacity-90 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
             >
-              {isUk ? 'Надіслати заявку' : 'Send request'} →
-            </button>
+              {submitting ? (isUk ? 'Надсилання…' : 'Sending…') : `${isUk ? 'Надіслати заявку' : 'Send request'} →`}
+            </motion.button>
           </div>
         </div>
       </form>
