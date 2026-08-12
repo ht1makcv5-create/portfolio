@@ -1683,28 +1683,16 @@ function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
           </AnimatePresence>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="divider-gradient">
-            <ContactLinkRow href="mailto:ht1makcv5@gmail.com" label="ht1makcv5@gmail.com" sub={t.emailSub} testId="link-email" />
-            <ContactLinkRow href="https://t.me/sefice" label="@sefice" sub={t.tgSub} testId="link-telegram" />
-          </div>
-        </motion.div>
-
-        {/* Order wizard */}
+        {/* Order wizard — front and center */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-24 md:mt-32"
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.5em] text-[hsl(var(--primary))]">
             {lang === 'uk' ? 'ГОТОВІ ПОЧАТИ?' : 'READY TO START?'}
           </p>
-          <h2 className="font-serif italic leading-[0.9] text-[hsl(var(--foreground))]" style={{ fontSize: 'clamp(2.6rem, 7vw, 6rem)' }}>
+          <h2 className="font-serif italic leading-[0.9] text-[hsl(var(--foreground))]" style={{ fontSize: 'clamp(3.2rem, 9vw, 8.5rem)' }}>
             {lang === 'uk' ? 'Замовити' : 'Order a'}
             <span className="block text-[hsl(var(--primary))]">{lang === 'uk' ? 'сайт під ключ' : 'website, start to finish'}</span>
           </h2>
@@ -1714,6 +1702,34 @@ function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
               <OrderWizard lang={lang} />
             </Suspense>
           </div>
+        </motion.div>
+
+        {/* Direct contacts — below the wizard */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-24 md:mt-32"
+        >
+          <div className="divider-gradient">
+            <ContactLinkRow href="mailto:ht1makcv5@gmail.com" label="ht1makcv5@gmail.com" sub={t.emailSub} testId="link-email" />
+            <ContactLinkRow href="https://t.me/sefice" label="@sefice" sub={t.tgSub} testId="link-telegram" />
+          </div>
+          <p className="mt-8 flex items-center gap-2 font-sans text-sm text-[hsl(var(--muted-foreground))]">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[hsl(var(--primary))]" />
+            {lang === 'uk'
+              ? 'Відповідаю зазвичай протягом години — найшвидше в Telegram: '
+              : 'I usually reply within an hour — fastest via Telegram: '}
+            <a
+              href="https://t.me/sefice"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="link-response-time-telegram"
+              className="text-[hsl(var(--primary))] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+            >
+              @sefice
+            </a>
+          </p>
         </motion.div>
 
         {/* Footer */}
