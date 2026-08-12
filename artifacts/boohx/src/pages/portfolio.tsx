@@ -56,7 +56,7 @@ const T: Record<Lang, Copy> = {
     basedIn: 'solitary practice, based in kyiv',
     scroll: 'scroll',
     navProjects: 'Projects',
-    navAbout: 'About',
+    navAbout: 'Team',
     navServices: 'Services',
     navContact: 'Contact',
     selectedWork: 'Selected Work',
@@ -94,7 +94,7 @@ const T: Record<Lang, Copy> = {
     basedIn: 'самостійна практика, київ',
     scroll: 'гортай',
     navProjects: 'Проєкти',
-    navAbout: 'Про мене',
+    navAbout: 'Команда',
     navServices: 'Послуги',
     navContact: 'Контакт',
     selectedWork: 'Роботи',
@@ -399,8 +399,8 @@ function MobileMenu({
   const navItems: { page: Page; label: string }[] = [
     { page: 'home', label: 'boohx™' },
     { page: 'projects', label: t.navProjects },
-    { page: 'about', label: t.navAbout },
     { page: 'services', label: t.navServices },
+    { page: 'about', label: t.navAbout },
     { page: 'contact', label: t.navContact },
   ];
 
@@ -497,8 +497,8 @@ function TopNav({
   const navItems: { page: Page; label: string }[] = [
     { page: 'home', label: lang === 'uk' ? 'Головна' : 'Home' },
     { page: 'projects', label: lang === 'uk' ? 'Проєкти' : 'Projects' },
-    { page: 'about', label: lang === 'uk' ? 'Про мене' : 'About' },
     { page: 'services', label: lang === 'uk' ? 'Послуги' : 'Services' },
+    { page: 'about', label: lang === 'uk' ? 'Команда' : 'Team' },
     { page: 'contact', label: lang === 'uk' ? 'Контакт' : 'Contact' },
   ];
 
@@ -1085,7 +1085,7 @@ function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
 /* ------------------------------------------------------------------ */
 /* ABOUT page                                                          */
 /* ------------------------------------------------------------------ */
-function AboutPage({ t, onContact }: { t: Copy; onContact: () => void }) {
+function AboutPage({ t, lang, onContact }: { t: Copy; lang: Lang; onContact: () => void }) {
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
@@ -1099,6 +1099,24 @@ function AboutPage({ t, onContact }: { t: Copy; onContact: () => void }) {
           <span className="font-sans text-xs tracking-[0.3em] text-[hsl(var(--primary))]">02</span>
           <span className="font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">{t.about}</span>
           <span className="h-px flex-1 bg-[hsl(var(--border))]" />
+        </motion.div>
+
+        {/* Team member card — no photo, initials avatar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-16 flex flex-col items-center gap-5 border border-[hsl(var(--border))] px-8 py-12 text-center transition-shadow duration-500 hover:shadow-[0_0_60px_-20px_hsl(var(--primary)_/_0.4)] md:mb-24"
+        >
+          <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[hsl(var(--primary)_/_0.5)] bg-[hsl(var(--primary)_/_0.08)] font-serif text-3xl italic text-[hsl(var(--primary))]">
+            B
+          </div>
+          <div>
+            <p className="font-serif text-2xl italic text-[hsl(var(--foreground))]">boohx</p>
+            <p className="mt-1 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+              {lang === 'uk' ? 'Засновник · веб-дизайн і розробка' : 'Founder · web design & development'}
+            </p>
+          </div>
         </motion.div>
 
         <div className="grid gap-12 md:grid-cols-12 md:gap-8">
@@ -1457,7 +1475,47 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
 
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
-      <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
+      {/* Purple-tinted "what do you need" hero */}
+      <div className="relative flex flex-col items-center overflow-hidden px-6 pb-24 pt-32 text-center md:pt-40">
+        <div
+          className="pointer-events-none absolute -top-20 left-1/2 -z-10 -translate-x-1/2 rounded-full blur-3xl"
+          style={{
+            width: '80%',
+            maxWidth: 900,
+            height: 420,
+            background: 'radial-gradient(ellipse 60% 55% at 35% 40%, rgba(124,92,255,0.28) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 70% 60%, rgba(90,72,255,0.2) 0%, transparent 70%)',
+          }}
+        />
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-4 font-sans text-xs uppercase tracking-[0.4em] text-[hsl(270_70%_72%)]"
+        >
+          {lang === 'uk' ? 'Послуги' : 'Services'}
+        </motion.p>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="font-sans font-bold leading-[0.95] text-[hsl(var(--foreground))]"
+          style={{ fontSize: 'clamp(2.6rem, 8vw, 5.5rem)' }}
+        >
+          {lang === 'uk' ? 'Що тобі потрібно?' : 'What do you need?'}
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-5 max-w-md font-sans text-sm text-[hsl(var(--muted-foreground))]"
+        >
+          {lang === 'uk'
+            ? 'Обери напрям нижче — або гортай список і читай деталі кожного формату.'
+            : 'Pick a direction below — or scroll through the list to read the details of each.'}
+        </motion.p>
+      </div>
+
+      <div className="mx-auto w-full max-w-6xl px-6 pt-4 pb-20 md:pb-28">
         {/* Section label */}
         <motion.div
           initial={{ opacity: 0, x: -24 }}
@@ -2116,7 +2174,7 @@ export default function Portfolio() {
         )}
         {currentPage === 'about' && (
           <PageWrap pageKey="about">
-            <AboutPage t={t} onContact={() => navigate('contact')} />
+            <AboutPage t={t} lang={savedLang} onContact={() => navigate('contact')} />
           </PageWrap>
         )}
         {currentPage === 'services' && (
