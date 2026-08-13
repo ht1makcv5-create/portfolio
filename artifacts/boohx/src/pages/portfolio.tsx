@@ -149,6 +149,8 @@ const PRICING_TIERS = [
   {
     id: 'basic',
     price: '3 500 ₴',
+    term: { uk: '3-5 днів', en: '3-5 days' },
+    tabLabel: { uk: 'Швидко', en: 'Fast' },
     recommended: false,
     uk: {
       name: 'Базовий',
@@ -170,6 +172,8 @@ const PRICING_TIERS = [
   {
     id: 'optimal',
     price: '4 500 ₴',
+    term: { uk: '5-9 днів', en: '5-9 days' },
+    tabLabel: { uk: 'Щоб знаходили в Google', en: 'Found on Google' },
     recommended: true,
     uk: {
       name: 'Оптимальний',
@@ -193,6 +197,8 @@ const PRICING_TIERS = [
   {
     id: 'max',
     price: '6 500 ₴',
+    term: { uk: '9-14 днів', en: '9-14 days' },
+    tabLabel: { uk: 'Максимум', en: 'Maximum' },
     recommended: false,
     uk: {
       name: 'Максимум',
@@ -236,51 +242,170 @@ const PRICING_TIERS = [
   },
 ];
 
+const TARIFF_TABS = [
+  {
+    id: 'basic',
+    price: '3 500 ₴',
+    uk: { tabLabel: 'Швидко', name: 'Базовий', tagline: 'Хочеш сайт швидко і без зайвого клопоту', term: '3-5 днів', items: [
+      'Повна розробка сайту (поточну версію макета вже можна дивитись)',
+      'Запуск та налаштування одного головного Telegram-бота',
+      'Розміщення на безкоштовній платформі — без щомісячної плати за сервери',
+    ] },
+    en: { tabLabel: 'Fast', name: 'Basic', tagline: 'Want a site fast, without extra hassle', term: '3-5 days', items: [
+      'Full website build (current mockup already viewable)',
+      'Launch and setup of one main Telegram bot',
+      'Hosted on a free platform — no monthly server fees',
+    ] },
+  },
+  {
+    id: 'optimal',
+    price: '4 500 ₴',
+    uk: { tabLabel: 'Щоб знаходили в Google', name: 'Оптимальний', tagline: 'Хочеш щоб твій сайт знаходили в Google', term: '5-9 днів', items: [
+      'Повна розробка сайту + фінальні правки під побажання',
+      'Запуск і синхронізація обох Telegram-ботів окремо',
+      'Стабільна робота без щомісячних абонплат за хостинг',
+      'Базове тестування системи перед фінальною здачею',
+    ] },
+    en: { tabLabel: 'Found on Google', name: 'Optimal', tagline: 'Want your site to actually rank on Google', term: '5-9 days', items: [
+      'Full website build + final revisions to your requests',
+      'Launch and sync of both Telegram bots separately',
+      'Stable setup with no monthly hosting fees',
+      'Basic QA testing before final handoff',
+    ] },
+  },
+  {
+    id: 'max',
+    price: '6 500 ₴',
+    uk: { tabLabel: 'Максимум', name: 'Максимум', tagline: "Хочеш щоб сайт справляв вау-ефект і запам'ятовувався", term: '9-14 днів', items: [
+      'Усе, що в тарифі «Оптимальний»',
+      'Розміщення на окремому виділеному сервері (VPS) для швидкості та стабільності 24/7',
+      '1 місяць технічної підтримки після запуску',
+    ] },
+    en: { tabLabel: 'Maximum', name: 'Max', tagline: 'Want the site to leave a real impression', term: '9-14 days', items: [
+      'Everything in the Optimal tier',
+      'Deployed on a dedicated VPS for 24/7 speed and stability',
+      '1 month of technical support after launch',
+    ] },
+  },
+];
+
 const SERVICES = [
   {
     id: 'landing',
-    en: { title: 'Landing Pages', short: 'One page — maximum conversion.', detail: 'A focused landing page built to promote a product or service. Fast, responsive, and structured to guide the visitor to a single clear action.' },
-    uk: { title: 'Розробка лендингів', short: 'Одна сторінка — максимум конверсії.', detail: 'Ефективна цільова сторінка для просування продукту або послуги. Швидка, адаптивна, зі структурою, що веде відвідувача до дії.' },
+    en: { title: 'Landing Pages', short: 'One page — maximum conversion.', detail: 'A focused landing page built to promote a product or service. Fast, responsive, and structured to guide the visitor to a single clear action.', stats: [
+      { value: '1 day', label: 'minimum timeline' },
+      { value: '90+', label: 'PageSpeed on mobile' },
+      { value: '60 days', label: 'support included' },
+    ] },
+    uk: { title: 'Розробка лендингів', short: 'Одна сторінка — максимум конверсії.', detail: 'Ефективна цільова сторінка для просування продукту або послуги. Швидка, адаптивна, зі структурою, що веде відвідувача до дії.', stats: [
+      { value: '1 день', label: 'мінімальний термін' },
+      { value: '90+', label: 'PageSpeed на мобільному' },
+      { value: '60 днів', label: 'підтримки максимум' },
+    ] },
   },
   {
     id: 'corporate',
-    en: { title: 'Corporate Websites', short: 'Your brand online — serious.', detail: 'Multi-page representative website for a company or brand. Built with a CMS so you can update content yourself without calling a developer.' },
-    uk: { title: 'Корпоративні сайти', short: 'Ваш бренд в інтернеті — серйозно.', detail: 'Багатосторінковий представницький сайт для компанії або бренду. Із CMS — щоб ви могли самостійно оновлювати контент без розробника.' },
+    en: { title: 'Corporate Websites', short: 'Your brand online — serious.', detail: 'Multi-page representative website for a company or brand. Built with a CMS so you can update content yourself without calling a developer.', stats: [
+      { value: '3 days', label: 'minimum timeline' },
+      { value: '90+', label: 'PageSpeed on mobile' },
+      { value: '60 days', label: 'support included' },
+    ] },
+    uk: { title: 'Корпоративні сайти', short: 'Ваш бренд в інтернеті — серйозно.', detail: 'Багатосторінковий представницький сайт для компанії або бренду. Із CMS — щоб ви могли самостійно оновлювати контент без розробника.', stats: [
+      { value: '3 дні', label: 'мінімальний термін' },
+      { value: '90+', label: 'PageSpeed на мобільному' },
+      { value: '60 днів', label: 'підтримки максимум' },
+    ] },
   },
   {
     id: 'shop',
-    en: { title: 'Online Stores', short: 'Full e-commerce, ready from day one.', detail: 'Complete online store with catalog, cart and payment integration. Optimized for speed and designed to drive sales from the moment of launch.' },
-    uk: { title: 'Інтернет-магазини', short: 'Повноцінний e-commerce з першого дня.', detail: 'Готовий магазин із каталогом, кошиком та підключенням оплати. Оптимізований для продажів та швидкої роботи з моменту запуску.' },
+    en: { title: 'Online Stores', short: 'Full e-commerce, ready from day one.', detail: 'Complete online store with catalog, cart and payment integration. Optimized for speed and designed to drive sales from the moment of launch.', stats: [
+      { value: '5 days', label: 'minimum timeline' },
+      { value: '85+', label: 'PageSpeed on mobile' },
+      { value: '60 days', label: 'support included' },
+    ] },
+    uk: { title: 'Інтернет-магазини', short: 'Повноцінний e-commerce з першого дня.', detail: 'Готовий магазин із каталогом, кошиком та підключенням оплати. Оптимізований для продажів та швидкої роботи з моменту запуску.', stats: [
+      { value: '5 днів', label: 'мінімальний термін' },
+      { value: '85+', label: 'PageSpeed на мобільному' },
+      { value: '60 днів', label: 'підтримки максимум' },
+    ] },
   },
   {
     id: 'uxui',
-    en: { title: 'UX / UI Design', short: 'Interfaces that guide, not confuse.', detail: "Wireframes, prototypes and final Figma designs. Clean interfaces built around the user's intent — every click leads somewhere meaningful." },
-    uk: { title: 'UX / UI дизайн', short: 'Інтерфейси, що ведуть, а не плутають.', detail: 'Вайрфрейми, прототипи та фінальний дизайн у Figma. Зрозумілий інтерфейс, побудований навколо мети користувача.' },
+    en: { title: 'UX / UI Design', short: 'Interfaces that guide, not confuse.', detail: "Wireframes, prototypes and final Figma designs. Clean interfaces built around the user's intent — every click leads somewhere meaningful.", stats: [
+      { value: '2 days', label: 'minimum timeline' },
+      { value: 'Figma', label: 'delivery format' },
+      { value: '2', label: 'revision rounds' },
+    ] },
+    uk: { title: 'UX / UI дизайн', short: 'Інтерфейси, що ведуть, а не плутають.', detail: 'Вайрфрейми, прототипи та фінальний дизайн у Figma. Зрозумілий інтерфейс, побудований навколо мети користувача.', stats: [
+      { value: '2 дні', label: 'мінімальний термін' },
+      { value: 'Figma', label: 'формат передачі' },
+      { value: '2', label: 'раунди правок' },
+    ] },
   },
   {
     id: 'frontend',
-    en: { title: 'Front-end Development', short: 'Turning design into a working site.', detail: 'I build the interface in code — responsive, fast, and true to the design. Clean, maintainable front-end that actually works the way it looks.' },
-    uk: { title: 'Frontend-розробка', short: 'Перетворюю дизайн на робочий сайт.', detail: 'Верстаю та програмую інтерфейс — адаптивно, швидко, у точній відповідності до дизайну. Чистий, підтримуваний код.' },
+    en: { title: 'Front-end Development', short: 'Turning design into a working site.', detail: 'I build the interface in code — responsive, fast, and true to the design. Clean, maintainable front-end that actually works the way it looks.', stats: [
+      { value: '3 days', label: 'minimum timeline' },
+      { value: '90+', label: 'PageSpeed on mobile' },
+      { value: '30 days', label: 'support included' },
+    ] },
+    uk: { title: 'Frontend-розробка', short: 'Перетворюю дизайн на робочий сайт.', detail: 'Верстаю та програмую інтерфейс — адаптивно, швидко, у точній відповідності до дизайну. Чистий, підтримуваний код.', stats: [
+      { value: '3 дні', label: 'мінімальний термін' },
+      { value: '90+', label: 'PageSpeed на мобільному' },
+      { value: '30 днів', label: 'підтримки максимум' },
+    ] },
   },
   {
     id: 'branding',
-    en: { title: 'Branding & Identity', short: 'A mark that means something.', detail: 'Logo, color palette, typography and brand guidelines. A consistent visual language across every touchpoint — web, print, social media.' },
-    uk: { title: 'Брендинг + айдентика', short: 'Знак, що щось означає.', detail: 'Логотип, палітра, шрифти та гайдлайн бренду. Єдиний стиль для всіх точок контакту — сайт, друк, соцмережі.' },
+    en: { title: 'Branding & Identity', short: 'A mark that means something.', detail: 'Logo, color palette, typography and brand guidelines. A consistent visual language across every touchpoint — web, print, social media.', stats: [
+      { value: '4 days', label: 'minimum timeline' },
+      { value: '3+', label: 'concepts to choose from' },
+      { value: '1', label: 'brand guideline file' },
+    ] },
+    uk: { title: 'Брендинг + айдентика', short: 'Знак, що щось означає.', detail: 'Логотип, палітра, шрифти та гайдлайн бренду. Єдиний стиль для всіх точок контакту — сайт, друк, соцмережі.', stats: [
+      { value: '4 дні', label: 'мінімальний термін' },
+      { value: '3+', label: 'концепти на вибір' },
+      { value: '1', label: 'файл гайдлайну' },
+    ] },
   },
   {
     id: 'launch',
-    en: { title: 'Website Launch', short: 'From finished build to production.', detail: 'Domain setup, hosting, final checks and going live. I make sure the site is genuinely ready for real visitors before launch day.' },
-    uk: { title: 'Запуск сайту', short: 'Від готової збірки до production.', detail: 'Налаштування домену, хостингу, фінальна перевірка та вихід у продакшн. Переконуюсь, що сайт справді готовий до реальних відвідувачів.' },
+    en: { title: 'Website Launch', short: 'From finished build to production.', detail: 'Domain setup, hosting, final checks and going live. I make sure the site is genuinely ready for real visitors before launch day.', stats: [
+      { value: '1 day', label: 'minimum timeline' },
+      { value: '90+', label: 'PageSpeed on mobile' },
+      { value: '0', label: 'downtime at launch' },
+    ] },
+    uk: { title: 'Запуск сайту', short: 'Від готової збірки до production.', detail: 'Налаштування домену, хостингу, фінальна перевірка та вихід у продакшн. Переконуюсь, що сайт справді готовий до реальних відвідувачів.', stats: [
+      { value: '1 день', label: 'мінімальний термін' },
+      { value: '90+', label: 'PageSpeed на мобільному' },
+      { value: '0', label: 'простою при запуску' },
+    ] },
   },
   {
     id: 'support',
-    en: { title: 'Ongoing Support', short: 'Help after the site goes live.', detail: 'Updates, fixes, and small improvements after launch — so the site keeps working and growing instead of gathering dust.' },
-    uk: { title: 'Підтримка сайту', short: 'Допомога після запуску.', detail: 'Оновлення, виправлення та невеликі покращення після запуску — щоб сайт не пилився, а розвивався.' },
+    en: { title: 'Ongoing Support', short: 'Help after the site goes live.', detail: 'Updates, fixes, and small improvements after launch — so the site keeps working and growing instead of gathering dust.', stats: [
+      { value: '24h', label: 'response time' },
+      { value: '60 days', label: 'covered minimum' },
+      { value: '∞', label: 'small fixes included' },
+    ] },
+    uk: { title: 'Підтримка сайту', short: 'Допомога після запуску.', detail: 'Оновлення, виправлення та невеликі покращення після запуску — щоб сайт не пилився, а розвивався.', stats: [
+      { value: '24г', label: 'час відповіді' },
+      { value: '60 днів', label: 'мінімальне покриття' },
+      { value: '∞', label: 'дрібних правок' },
+    ] },
   },
   {
     id: 'seo',
-    en: { title: 'SEO Optimization', short: 'Found on Google, not buried.', detail: 'Technical SEO, meta tags, site structure and speed optimization. So your target audience finds you without you having to chase them.' },
-    uk: { title: 'SEO-оптимізація', short: 'Знайдуть в Google, а не в його надрах.', detail: 'Технічне SEO, мета-теги, структура та швидкість сайту. Щоб ваша аудиторія знаходила вас сама.' },
+    en: { title: 'SEO Optimization', short: 'Found on Google, not buried.', detail: 'Technical SEO, meta tags, site structure and speed optimization. So your target audience finds you without you having to chase them.', stats: [
+      { value: '5 days', label: 'minimum timeline' },
+      { value: '90+', label: 'PageSpeed on mobile' },
+      { value: '30 days', label: 'support included' },
+    ] },
+    uk: { title: 'SEO-оптимізація', short: 'Знайдуть в Google, а не в його надрах.', detail: 'Технічне SEO, мета-теги, структура та швидкість сайту. Щоб ваша аудиторія знаходила вас сама.', stats: [
+      { value: '5 днів', label: 'мінімальний термін' },
+      { value: '90+', label: 'PageSpeed на мобільному' },
+      { value: '30 днів', label: 'підтримки максимум' },
+    ] },
   },
 ];
 
@@ -1471,7 +1596,10 @@ function BotOrderForm({ lang }: { lang: Lang }) {
 }
 
 function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState(0);
   const railRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
   const { scrollYProgress } = useScroll({ target: railRef, offset: ['start center', 'end center'] });
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 22, mass: 0.4 });
   const dotTopPercent = useTransform(smoothProgress, [0, 1], [0, 100]);
@@ -1549,10 +1677,11 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
             aria-hidden
           />
 
-          <div className="flex flex-col gap-14 md:gap-20">
+          <div className="flex flex-col gap-10 md:gap-14">
             {SERVICES.map((svc, i) => {
               const s = svc[lang];
               const onRight = i % 2 === 1;
+              const isOpen = openId === svc.id;
               return (
                 <motion.div
                   key={svc.id}
@@ -1561,73 +1690,147 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
                   viewport={{ once: true, margin: '-15% 0px -15% 0px' }}
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                   data-testid={`card-service-${svc.id}`}
-                  className={`relative flex min-h-[32vh] flex-col justify-center py-6 md:w-[calc(50%-2.5rem)] ${
+                  className={`relative flex min-h-[22vh] flex-col justify-center py-4 md:w-[calc(50%-2.5rem)] ${
                     onRight ? 'md:ml-auto md:text-left' : 'md:mr-auto md:text-right'
                   }`}
                 >
                   <span className="font-sans text-xs tracking-[0.3em] text-[hsl(270_70%_72%)]">0{i + 1}</span>
-                  <p className={`mt-4 font-serif text-xl italic leading-snug text-[hsl(var(--muted-foreground))] ${onRight ? '' : 'md:ml-auto md:max-w-sm'}`}>
+                  <p className={`mt-3 font-serif text-xl italic leading-snug text-[hsl(var(--muted-foreground))] ${onRight ? '' : 'md:ml-auto md:max-w-sm'}`}>
                     {s.short}
                   </p>
-                  <h3 className="mt-2 font-sans text-4xl font-bold leading-[0.95] text-[hsl(var(--foreground))] md:text-5xl">
+                  <h3 className="mt-2 font-sans text-5xl font-bold leading-[0.92] text-[hsl(var(--foreground))] md:text-6xl">
                     {s.title}
                   </h3>
-                  <p className={`mt-5 font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))] ${onRight ? 'md:max-w-sm' : 'md:ml-auto md:max-w-sm'}`}>
-                    {s.detail}
-                  </p>
+
+                  <motion.button
+                    type="button"
+                    onClick={() => setOpenId(isOpen ? null : svc.id)}
+                    aria-expanded={isOpen}
+                    whileHover={{ gap: '0.75rem' }}
+                    data-testid={`button-service-more-${svc.id}`}
+                    className={`mt-5 inline-flex w-fit items-center gap-2 border-b border-[hsl(var(--foreground)_/_0.4)] pb-1 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(var(--foreground))] transition-colors hover:border-[hsl(270_70%_72%)] hover:text-[hsl(270_70%_72%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${onRight ? '' : 'md:ml-auto'}`}
+                  >
+                    {isOpen ? (lang === 'uk' ? 'Згорнути' : 'Collapse') : (lang === 'uk' ? 'Детальніше' : 'Learn more')}
+                    <span aria-hidden>{isOpen ? '↑' : '→'}</span>
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                        animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <p className={`font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))] ${onRight ? 'md:max-w-sm' : 'md:ml-auto md:max-w-sm'}`}>
+                          {s.detail}
+                        </p>
+                        <div className={`mt-6 flex flex-wrap gap-6 ${onRight ? '' : 'md:justify-end'}`}>
+                          {s.stats.map((stat) => (
+                            <div key={stat.label} className={onRight ? 'text-left' : 'text-left md:text-right'}>
+                              <p className="font-sans text-xl font-bold text-[hsl(var(--foreground))]">
+                                {stat.value}
+                                <span className="text-[hsl(270_70%_72%)]">.</span>
+                              </p>
+                              <p className="mt-0.5 max-w-[9rem] font-sans text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--muted-foreground))]">
+                                {stat.label}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               );
             })}
           </div>
         </div>
 
-        {/* Pricing tiers */}
+        {/* Tariff tabs */}
         <div className="divider-gradient mt-20 pt-14">
-          <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.4em] text-[hsl(var(--muted-foreground))]">
+          <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.4em] text-[hsl(270_70%_72%)]">
             {lang === 'uk' ? 'ОРІЄНТОВНІ ТАРИФИ' : 'SAMPLE PRICING'}
           </p>
-          <h2 className="font-serif text-3xl italic text-[hsl(var(--foreground))] md:text-4xl">
-            {lang === 'uk' ? 'Оберіть варіант співпраці' : 'Pick a way to work together'}
+          <h2
+            className="font-sans font-bold leading-[0.95] text-[hsl(var(--foreground))]"
+            style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)' }}
+          >
+            {lang === 'uk' ? 'Що тобі потрібно?' : 'What do you need?'}
           </h2>
-          <p className="mt-3 max-w-lg font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-            {lang === 'uk'
-              ? 'Орієнтир на прикладі задачі «сайт + Telegram-боти». Реальна вартість завжди узгоджується під конкретний проєкт.'
-              : 'Based on a "website + Telegram bots" example project. Final pricing is always confirmed per project.'}
-          </p>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
-            {PRICING_TIERS.map((tier, i) => {
-              const p = tier[lang];
+          <div className="mt-10 grid gap-3 md:grid-cols-3">
+            {TARIFF_TABS.map((tab, i) => {
+              const tb = tab[lang];
               return (
-                <motion.div
-                  key={tier.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.05 * i, ease: [0.16, 1, 0.3, 1] }}
-                  data-testid={`card-pricing-${tier.id}`}
-                  className={`relative flex flex-col border p-6 transition-shadow duration-500 hover:shadow-[0_0_50px_-18px_hsl(var(--primary)_/_0.5)] ${
-                    tier.recommended ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)_/_0.06)]' : 'border-[hsl(var(--border))]'
+                <motion.button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(i)}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  aria-pressed={activeTab === i}
+                  data-testid={`button-tariff-tab-${tab.id}`}
+                  className={`border p-5 text-left transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${
+                    activeTab === i ? 'border-[hsl(270_70%_60%)] bg-[hsl(270_70%_60%_/_0.08)]' : 'border-[hsl(var(--border))]'
                   }`}
                 >
-                  {tier.recommended && (
-                    <span className="absolute -top-3 left-6 bg-[hsl(var(--primary))] px-3 py-1 font-sans text-[10px] uppercase tracking-[0.2em] text-[hsl(var(--primary-foreground))]">
-                      {lang === 'uk' ? 'Рекомендую' : 'Recommended'}
-                    </span>
-                  )}
-                  <h3 className="font-serif text-xl italic text-[hsl(var(--foreground))]">{p.name}</h3>
-                  <p className="mt-2 font-sans text-2xl font-semibold text-[hsl(var(--primary))]">{tier.price}</p>
-                  <ul className="mt-5 flex-1 space-y-2.5">
-                    {p.items.map((item) => (
-                      <li key={item} className="flex gap-2 font-sans text-xs leading-relaxed text-[hsl(var(--muted-foreground))]">
-                        <span className="mt-1 text-[hsl(var(--primary))]" aria-hidden>✓</span>
+                  <span className="font-sans text-xs tracking-[0.2em] text-[hsl(270_70%_72%)]">0{i + 1}</span>
+                  <p className="mt-2 font-sans text-xl font-bold text-[hsl(var(--foreground))]">{tb.tabLabel}</p>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          <AnimatePresence mode="wait">
+            {(() => {
+              const tab = TARIFF_TABS[activeTab];
+              const tb = tab[lang];
+              return (
+                <motion.div
+                  key={tab.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  data-testid={`card-tariff-${tab.id}`}
+                  className="mt-6 grid gap-10 border border-[hsl(var(--border))] p-8 transition-shadow duration-500 hover:shadow-[0_0_60px_-20px_hsl(270_70%_60%_/_0.5)] md:grid-cols-2 md:p-12"
+                >
+                  <div>
+                    <h3 className="font-sans text-4xl font-bold text-[hsl(var(--foreground))] md:text-5xl">{tb.name}</h3>
+                    <p className="mt-3 max-w-xs font-serif text-lg italic leading-snug text-[hsl(var(--muted-foreground))]">
+                      {tb.tagline}
+                    </p>
+                    <p className="mt-6 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(270_70%_72%)]">
+                      {lang === 'uk' ? 'ТЕРМІН' : 'TIMELINE'}: {tb.term}
+                    </p>
+                    <motion.button
+                      type="button"
+                      onClick={() => {
+                        const params = new URLSearchParams({ service: tb.name, pkg: tb.tabLabel });
+                        setLocation(`/contact?${params.toString()}`);
+                      }}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      data-testid="button-tariff-discuss"
+                      className="mt-8 inline-flex items-center gap-3 bg-[hsl(270_70%_60%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(270_70%_60%)]"
+                    >
+                      {lang === 'uk' ? 'Обговорити проєкт' : 'Discuss the project'} →
+                    </motion.button>
+                  </div>
+                  <ul className="space-y-3 self-center">
+                    {tb.items.map((item) => (
+                      <li key={item} className="flex gap-2.5 font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+                        <span className="mt-0.5 text-[hsl(270_70%_72%)]" aria-hidden>✓</span>
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
                 </motion.div>
               );
-            })}
-          </div>
+            })()}
+          </AnimatePresence>
         </div>
 
         <BotOrderForm lang={lang} />
@@ -1804,277 +2007,19 @@ function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
 /* Global "Order a website" CTA + slide-out panel                      */
 /* ------------------------------------------------------------------ */
 function GlobalOrderCta({ lang }: { lang: Lang }) {
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [, setLocation] = useLocation();
   const label = lang === 'uk' ? 'Замовити сайт' : 'Order a website';
 
   return (
-    <>
-      <motion.button
-        ref={triggerRef}
-        onClick={() => setOpen(true)}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.96 }}
-        data-testid="button-order-site-global"
-        aria-haspopup="dialog"
-        className="fixed bottom-5 right-5 z-[70] border border-[hsl(var(--primary)_/_0.55)] bg-[hsl(var(--background)_/_0.9)] px-5 py-3 font-sans text-[11px] uppercase tracking-[0.22em] text-[hsl(var(--primary))] shadow-lg backdrop-blur-sm transition-colors hover:bg-[hsl(var(--primary)_/_0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:bottom-8 md:right-8 md:px-6 md:py-3.5"
-      >
-        {label}
-      </motion.button>
-      <AnimatePresence>
-        {open && (
-          <OrderSitePanel
-            lang={lang}
-            onClose={() => {
-              setOpen(false);
-              triggerRef.current?.focus();
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
-function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) {
-  const isUk = lang === 'uk';
-  const panelRef = useRef<HTMLDivElement>(null);
-  const [sent, setSent] = useState(false);
-  const [sendError, setSendError] = useState(false);
-  const [lastUrl, setLastUrl] = useState('');
-  const [form, setForm] = useState({ name: '', contact: '', service: '', budget: '', message: '' });
-  const update = (key: keyof typeof form, value: string) => setForm((f) => ({ ...f, [key]: value }));
-
-  const services = isUk
-    ? ['Лендинг', 'Корпоративний сайт', 'Інтернет-магазин', 'UI/UX дизайн', 'Інше']
-    : ['Landing page', 'Corporate website', 'Online store', 'UI/UX design', 'Other'];
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-        return;
-      }
-      if (e.key === 'Tab' && panelRef.current) {
-        const focusables = Array.from(
-          panelRef.current.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-          )
-        );
-        if (focusables.length === 0) return;
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const lenis = (window as unknown as { __boohxLenis?: { stop: () => void; start: () => void } }).__boohxLenis;
-    lenis?.stop();
-    panelRef.current?.focus();
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
-      lenis?.start();
-    };
-  }, [onClose]);
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const name = form.name.trim();
-    const message = form.message.replace(/\s+/g, ' ').trim();
-    if (name.length < 2 || message.length < 5) return;
-    const lines = [
-      `🌐 ${isUk ? 'Замовлення сайту' : 'Website order'}`,
-      `👤 ${isUk ? 'Імʼя' : 'Name'}: ${name}`,
-      `📱 ${isUk ? 'Контакт' : 'Contact'}: ${form.contact.trim()}`,
-      form.service ? `🏷 ${isUk ? 'Послуга' : 'Service'}: ${form.service}` : '',
-      form.budget.trim() ? `💰 ${isUk ? 'Бюджет' : 'Budget'}: ${form.budget.trim()}` : '',
-      `📝 ${isUk ? 'Опис' : 'Message'}: ${message}`,
-    ].filter(Boolean).join('\n');
-    const tgUrl = `https://t.me/sefice?text=${encodeURIComponent(lines)}`;
-    const win = window.open(tgUrl, '_blank', 'noopener,noreferrer');
-    if (!win) {
-      setSendError(true);
-      setLastUrl(tgUrl);
-      return;
-    }
-    setSendError(false);
-    setSent(true);
-  };
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-[95] flex justify-end bg-[hsl(var(--background)_/_0.72)] backdrop-blur-sm"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
-      onClick={onClose}
+    <motion.button
+      onClick={() => setLocation('/contact')}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.96 }}
+      data-testid="button-order-site-global"
+      className="fixed bottom-5 right-5 z-[70] border border-[hsl(var(--primary)_/_0.55)] bg-[hsl(var(--background)_/_0.9)] px-5 py-3 font-sans text-[11px] uppercase tracking-[0.22em] text-[hsl(var(--primary))] shadow-lg backdrop-blur-sm transition-colors hover:bg-[hsl(var(--primary)_/_0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:bottom-8 md:right-8 md:px-6 md:py-3.5"
     >
-      <motion.div
-        ref={panelRef}
-        tabIndex={-1}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="order-panel-title"
-        data-testid="dialog-order-panel"
-        onClick={(e) => e.stopPropagation()}
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="flex h-[100dvh] w-full max-w-md flex-col overflow-y-auto border-l border-[hsl(var(--border))] bg-[hsl(var(--background))] p-6 outline-none md:p-10"
-      >
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <div>
-            <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-[hsl(var(--primary))]">
-              {isUk ? 'Нове замовлення' : 'New order'}
-            </p>
-            <h2 id="order-panel-title" className="mt-2 font-serif text-3xl italic text-[hsl(var(--foreground))] md:text-4xl">
-              {isUk ? 'Замовити сайт' : 'Order a website'}
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            data-testid="button-close-order-panel"
-            aria-label={isUk ? 'Закрити' : 'Close'}
-            className="rounded-full border border-[hsl(var(--border))] p-3 text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[hsl(var(--primary))]"
-          >
-            ✕
-          </button>
-        </div>
-
-        {sent ? (
-          <div className="flex flex-1 flex-col justify-center py-8" data-testid="text-order-sent">
-            <p className="font-serif text-3xl italic text-[hsl(var(--foreground))]">
-              {isUk ? 'Telegram відкрито — надішліть повідомлення!' : 'Telegram opened — just hit send!'}
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-              {isUk ? 'Якщо вікно не відкрилось, напишіть напряму: @sefice' : "If it didn't open, message directly: @sefice"}
-            </p>
-            <button
-              onClick={() => {
-                setSent(false);
-                setForm({ name: '', contact: '', service: '', budget: '', message: '' });
-              }}
-              data-testid="button-order-again"
-              className="mt-8 w-fit border-b border-[hsl(var(--foreground))] pb-1 text-sm hover:text-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-            >
-              {isUk ? 'Надіслати ще одну заявку' : 'Send another request'}
-            </button>
-          </div>
-        ) : sendError ? (
-          <div className="flex flex-1 flex-col justify-center py-8" data-testid="text-order-error" role="alert">
-            <p className="font-serif text-2xl italic text-[hsl(var(--foreground))]">
-              {isUk ? 'Браузер заблокував спливаюче вікно' : 'Your browser blocked the pop-up'}
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-              {isUk
-                ? 'Ваші дані нікуди не зникли — просто натисніть кнопку нижче, щоб відкрити Telegram вручну.'
-                : "Your details weren't lost — just tap the button below to open Telegram manually."}
-            </p>
-            <a
-              href={lastUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => {
-                setSendError(false);
-                setSent(true);
-              }}
-              data-testid="link-order-fallback"
-              className="mt-8 inline-flex w-fit items-center gap-3 border border-[hsl(var(--primary)_/_0.6)] bg-[hsl(var(--primary)_/_0.1)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-            >
-              {isUk ? 'Відкрити Telegram' : 'Open Telegram'}
-            </a>
-            <button
-              type="button"
-              onClick={() => setSendError(false)}
-              data-testid="button-order-error-back"
-              className="mt-4 w-fit text-xs uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] underline hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-            >
-              {isUk ? 'Повернутись до форми' : 'Back to the form'}
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <label className="block">
-              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? "Ваше ім'я" : 'Your name'}</span>
-              <input
-                required
-                minLength={2}
-                value={form.name}
-                onChange={(e) => update('name', e.target.value)}
-                data-testid="input-panel-name"
-                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">
-                {isUk ? 'Телефон, Telegram або email' : 'Phone, Telegram, or email'}
-              </span>
-              <input
-                required
-                minLength={3}
-                value={form.contact}
-                onChange={(e) => update('contact', e.target.value)}
-                data-testid="input-panel-contact"
-                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? 'Що потрібно зробити' : 'What do you need'}</span>
-              <select
-                value={form.service}
-                onChange={(e) => update('service', e.target.value)}
-                data-testid="select-panel-service"
-                className="w-full border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-              >
-                <option value="">{isUk ? 'Оберіть послугу' : 'Choose a service'}</option>
-                {services.map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
-              </select>
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? 'Орієнтовний бюджет' : 'Rough budget'}</span>
-              <input
-                value={form.budget}
-                onChange={(e) => update('budget', e.target.value)}
-                data-testid="input-panel-budget"
-                className="w-full border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1.5 block text-xs text-[hsl(var(--muted-foreground))]">{isUk ? 'Коротко про завдання' : 'Briefly about the task'}</span>
-              <textarea
-                required
-                minLength={5}
-                rows={4}
-                value={form.message}
-                onChange={(e) => update('message', e.target.value)}
-                data-testid="input-panel-message"
-                className="w-full resize-none border-b border-[hsl(var(--border))] bg-transparent py-2 text-sm text-[hsl(var(--foreground))] outline-none focus:border-[hsl(var(--primary))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-              />
-            </label>
-            <button
-              type="submit"
-              data-testid="button-panel-submit"
-              className="mt-2 w-full border border-[hsl(var(--primary)_/_0.6)] bg-[hsl(var(--primary)_/_0.1)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.15em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
-            >
-              {isUk ? 'Відправити в Telegram' : 'Send via Telegram'}
-            </button>
-          </form>
-        )}
-      </motion.div>
-    </motion.div>
+      {label}
+    </motion.button>
   );
 }
 
@@ -2084,7 +2029,7 @@ function OrderSitePanel({ lang, onClose }: { lang: Lang; onClose: () => void }) 
 const PAGE_SLUGS: readonly Page[] = ['home', 'projects', 'about', 'services', 'contact', 'case-mzshop'];
 
 function pageFromLocation(location: string): Page {
-  const slug = location.replace(/^\/+/, '');
+  const slug = location.replace(/^\/+/, '').split('?')[0];
   return (PAGE_SLUGS as readonly string[]).includes(slug) ? (slug as Page) : 'home';
 }
 
