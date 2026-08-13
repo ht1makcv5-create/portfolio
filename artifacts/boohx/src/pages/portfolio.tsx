@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { ReactNode, FormEvent } from 'react';
-import { motion, useMotionValue, useSpring, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useScroll, useTransform, useMotionTemplate, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import Lenis from 'lenis';
 
@@ -1471,14 +1471,11 @@ function BotOrderForm({ lang }: { lang: Lang }) {
 }
 
 function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
-  const [openService, setOpenService] = useState<string | null>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const [activeIdx, setActiveIdx] = useState(0);
   const { scrollYProgress } = useScroll({ target: railRef, offset: ['start center', 'end center'] });
-  useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    const idx = Math.round(v * (SERVICES.length - 1));
-    setActiveIdx(Math.min(SERVICES.length - 1, Math.max(0, idx)));
-  });
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 22, mass: 0.4 });
+  const dotTopPercent = useTransform(smoothProgress, [0, 1], [0, 100]);
+  const dotTop = useMotionTemplate`${dotTopPercent}%`;
 
   return (
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
@@ -1535,76 +1532,51 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
           <span className="h-px flex-1 bg-[hsl(var(--border))]" />
         </motion.div>
 
-        <div className="grid gap-8 md:grid-cols-[28px_1fr]">
-          {/* Scroll-progress gauge rail */}
-          <div className="relative hidden md:block" aria-hidden>
-            <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-[hsl(var(--border))]" />
-            {SERVICES.map((svc, i) => (
-              <div
-                key={svc.id}
-                className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-500 ease-out"
-                style={{
-                  top: `${(i / (SERVICES.length - 1)) * 100}%`,
-                  width: activeIdx === i ? 12 : 7,
-                  height: activeIdx === i ? 12 : 7,
-                  background: activeIdx === i ? 'hsl(270 75% 68%)' : 'transparent',
-                  border: activeIdx === i ? 'none' : '1px solid hsl(var(--border))',
-                  boxShadow: activeIdx === i ? '0 0 18px 3px hsl(270 75% 68% / 0.55)' : 'none',
-                }}
-              />
-            ))}
-          </div>
+        {/* Alternating slides with a centered, continuously-moving gauge line */}
+        <div ref={railRef} className="relative">
+          {/* Center line — runs through the whole section */}
+          <div className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-[hsl(var(--border))] md:block" aria-hidden />
+          {/* Soft glow trailing the dot */}
+          <motion.div
+            className="pointer-events-none absolute left-1/2 hidden h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl md:block"
+            style={{ top: dotTop, background: 'radial-gradient(circle, hsl(270 75% 68% / 0.35) 0%, transparent 70%)' }}
+            aria-hidden
+          />
+          {/* The single continuously-moving indicator dot */}
+          <motion.div
+            className="pointer-events-none absolute left-1/2 hidden h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(270_75%_68%)] shadow-[0_0_16px_4px_hsl(270_75%_68%_/_0.6)] md:block"
+            style={{ top: dotTop }}
+            aria-hidden
+          />
 
-          <div ref={railRef} className="flex flex-col">
+          <div className="flex flex-col gap-14 md:gap-20">
             {SERVICES.map((svc, i) => {
               const s = svc[lang];
-              const isOpen = openService === svc.id;
+              const onRight = i % 2 === 1;
               return (
-              <motion.div
-                key={svc.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.06 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-                className="border-b border-[hsl(var(--border))] transition-shadow duration-500 hover:shadow-[0_0_45px_-18px_hsl(var(--primary)_/_0.4)]"
-              >
-                <button
-                  onClick={() => setOpenService(isOpen ? null : svc.id)}
-                  aria-expanded={isOpen}
-                  data-testid={`button-service-${svc.id}`}
-                  className="group flex w-full items-center gap-5 py-6 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+                <motion.div
+                  key={svc.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-15% 0px -15% 0px' }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  data-testid={`card-service-${svc.id}`}
+                  className={`relative flex min-h-[32vh] flex-col justify-center py-6 md:w-[calc(50%-2.5rem)] ${
+                    onRight ? 'md:ml-auto md:text-left' : 'md:mr-auto md:text-right'
+                  }`}
                 >
-                  <span className="shrink-0 font-serif italic text-2xl leading-none text-[hsl(var(--muted-foreground)_/_0.3)] group-hover:text-[hsl(var(--primary)_/_0.5)] transition-colors">
-                    0{i + 1}
-                  </span>
-                  <div className="flex-1">
-                    <span className="font-serif text-2xl italic text-[hsl(var(--foreground))] md:text-3xl">{s.title}</span>
-                    <span className="mt-1 block font-sans text-xs text-[hsl(var(--muted-foreground))] tracking-wide">{s.short}</span>
-                  </div>
-                  <motion.span
-                    animate={{ rotate: isOpen ? 45 : 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="text-[hsl(var(--primary))] text-xl leading-none"
-                  >
-                    +
-                  </motion.span>
-                </button>
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <p className="pb-6 pl-11 font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))] max-w-xl">
-                        {s.detail}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
+                  <span className="font-sans text-xs tracking-[0.3em] text-[hsl(270_70%_72%)]">0{i + 1}</span>
+                  <p className={`mt-4 font-serif text-xl italic leading-snug text-[hsl(var(--muted-foreground))] ${onRight ? '' : 'md:ml-auto md:max-w-sm'}`}>
+                    {s.short}
+                  </p>
+                  <h3 className="mt-2 font-sans text-4xl font-bold leading-[0.95] text-[hsl(var(--foreground))] md:text-5xl">
+                    {s.title}
+                  </h3>
+                  <p className={`mt-5 font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))] ${onRight ? 'md:max-w-sm' : 'md:ml-auto md:max-w-sm'}`}>
+                    {s.detail}
+                  </p>
+                </motion.div>
+              );
             })}
           </div>
         </div>
