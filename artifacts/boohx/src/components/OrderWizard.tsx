@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,6 +43,17 @@ export default function OrderWizard({ lang }: { lang: Lang }) {
 
   const set = <K extends keyof WizardState>(key: K, value: WizardState[K]) =>
     setData((d) => ({ ...d, [key]: value }));
+
+  // Prefill from ?service=...&pkg=... (e.g. coming from a "Discuss project" CTA on Services)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const service = params.get('service');
+    const pkg = params.get('pkg');
+    if (service || pkg) {
+      setData((d) => ({ ...d, service: service || d.service, pkg: pkg || d.pkg }));
+      setMaxReached((m) => Math.max(m, 1));
+    }
+  }, []);
 
   const steps = isUk
     ? ['Що потрібно', 'Пакет і бюджет', 'Про проєкт', 'Контакти']
