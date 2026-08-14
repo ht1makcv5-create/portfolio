@@ -12,7 +12,8 @@ const OrderWizard = lazy(() => import('@/components/OrderWizard'));
 /* Types                                                               */
 /* ------------------------------------------------------------------ */
 type Lang = 'en' | 'uk';
-type Page = 'home' | 'projects' | 'about' | 'services' | 'contact' | 'case-mzshop';
+type ServiceId = 'landing' | 'corporate' | 'shop' | 'uxui' | 'frontend' | 'branding' | 'launch' | 'support' | 'seo';
+type Page = 'home' | 'projects' | 'about' | 'services' | 'contact' | 'case-mzshop' | ServiceId;
 
 /* ------------------------------------------------------------------ */
 /* Translations                                                        */
@@ -1044,6 +1045,121 @@ function ProjectsPage({ t, lang, onOpenCase }: { t: Copy; lang: Lang; onOpenCase
 /* ------------------------------------------------------------------ */
 /* CASE STUDY page — mzshop.xyz / Галина Коцюба                       */
 /* ------------------------------------------------------------------ */
+function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typeof SERVICES)[number]; index: number; lang: Lang; onBack: () => void; onNavigate: (page: Page) => void }) {
+  const isUk = lang === 'uk';
+  const s = svc[lang];
+  const [, setLocation] = useLocation();
+
+  return (
+    <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
+      {/* Purple glow, matching the Services hero */}
+      <div
+        className="pointer-events-none absolute left-0 top-0 -z-10 h-[480px] w-full"
+        style={{
+          background: 'radial-gradient(ellipse 55% 60% at 25% 20%, rgba(124,92,255,0.22) 0%, transparent 70%)',
+        }}
+        aria-hidden
+      />
+
+      <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-24 md:pt-36 md:pb-32">
+        {/* Breadcrumb */}
+        <motion.p
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-1 font-sans text-xs text-[hsl(var(--muted-foreground))]"
+        >
+          <button onClick={() => onNavigate('home')} className="hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[hsl(var(--primary))]" data-testid="link-breadcrumb-home">
+            {isUk ? 'Головна' : 'Home'}
+          </button>
+          {' / '}
+          <button onClick={onBack} className="hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[hsl(var(--primary))]" data-testid="link-breadcrumb-services">
+            {isUk ? 'Послуги' : 'Services'}
+          </button>
+          {' / '}
+          <span className="text-[hsl(var(--foreground))]">{s.title}</span>
+        </motion.p>
+        <p className="mb-10 font-sans text-[11px] uppercase tracking-[0.3em] text-[hsl(270_70%_72%)]">
+          {isUk ? 'ПОСЛУГА' : 'SERVICE'} / 0{index + 1}
+        </p>
+
+        <div className="grid gap-12 md:grid-cols-[1fr_280px] md:gap-16">
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="font-sans font-bold leading-[0.95] text-[hsl(var(--foreground))]"
+              style={{ fontSize: 'clamp(2.6rem, 6.5vw, 4.5rem)' }}
+            >
+              {s.title}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="mt-6 max-w-xl font-sans text-base leading-relaxed text-[hsl(var(--muted-foreground))]"
+            >
+              {s.detail}
+            </motion.p>
+
+            <motion.button
+              type="button"
+              onClick={() => {
+                const params = new URLSearchParams({ service: s.title });
+                setLocation(`/contact?${params.toString()}`);
+              }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              data-testid="button-service-detail-discuss"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+              className="mt-10 inline-flex items-center gap-3 bg-[hsl(270_70%_60%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(270_70%_60%)]"
+            >
+              {isUk ? 'Обговорити проєкт' : 'Discuss the project'} →
+            </motion.button>
+
+            <motion.button
+              type="button"
+              onClick={onBack}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              data-testid="button-back-to-services"
+              className="mt-6 block font-sans text-xs uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+            >
+              ← {isUk ? 'Усі послуги' : 'All services'}
+            </motion.button>
+          </div>
+
+          {/* Stats column */}
+          <div className="flex flex-col gap-8 md:border-l md:border-[hsl(var(--border))] md:pl-10">
+            {s.stats.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
+                data-testid={`stat-service-detail-${i}`}
+              >
+                <p className="font-sans text-4xl font-bold leading-none text-[hsl(var(--foreground))]">
+                  {stat.value}
+                  <span className="text-[hsl(270_70%_72%)]">.</span>
+                </p>
+                <p className="mt-2 max-w-[10rem] font-sans text-xs uppercase tracking-[0.15em] text-[hsl(var(--muted-foreground))]">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
   const isUk = lang === 'uk';
   return (
@@ -1595,8 +1711,7 @@ function BotOrderForm({ lang }: { lang: Lang }) {
   );
 }
 
-function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
-  const [openId, setOpenId] = useState<string | null>(null);
+function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate: (page: Page) => void }) {
   const [activeTab, setActiveTab] = useState(0);
   const railRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
@@ -1681,7 +1796,6 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
             {SERVICES.map((svc, i) => {
               const s = svc[lang];
               const onRight = i % 2 === 1;
-              const isOpen = openId === svc.id;
               return (
                 <motion.div
                   key={svc.id}
@@ -1704,44 +1818,14 @@ function ServicesPage({ t, lang }: { t: Copy; lang: Lang }) {
 
                   <motion.button
                     type="button"
-                    onClick={() => setOpenId(isOpen ? null : svc.id)}
-                    aria-expanded={isOpen}
+                    onClick={() => onNavigate(svc.id as Page)}
                     whileHover={{ gap: '0.75rem' }}
                     data-testid={`button-service-more-${svc.id}`}
                     className={`mt-5 inline-flex w-fit items-center gap-2 border-b border-[hsl(var(--foreground)_/_0.4)] pb-1 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(var(--foreground))] transition-colors hover:border-[hsl(270_70%_72%)] hover:text-[hsl(270_70%_72%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${onRight ? '' : 'md:ml-auto'}`}
                   >
-                    {isOpen ? (lang === 'uk' ? 'Згорнути' : 'Collapse') : (lang === 'uk' ? 'Детальніше' : 'Learn more')}
-                    <span aria-hidden>{isOpen ? '↑' : '→'}</span>
+                    {lang === 'uk' ? 'Детальніше' : 'Learn more'}
+                    <span aria-hidden>→</span>
                   </motion.button>
-
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                        animate={{ opacity: 1, height: 'auto', marginTop: 24 }}
-                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <p className={`font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))] ${onRight ? 'md:max-w-sm' : 'md:ml-auto md:max-w-sm'}`}>
-                          {s.detail}
-                        </p>
-                        <div className={`mt-6 flex flex-wrap gap-6 ${onRight ? '' : 'md:justify-end'}`}>
-                          {s.stats.map((stat) => (
-                            <div key={stat.label} className={onRight ? 'text-left' : 'text-left md:text-right'}>
-                              <p className="font-sans text-xl font-bold text-[hsl(var(--foreground))]">
-                                {stat.value}
-                                <span className="text-[hsl(270_70%_72%)]">.</span>
-                              </p>
-                              <p className="mt-0.5 max-w-[9rem] font-sans text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--muted-foreground))]">
-                                {stat.label}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </motion.div>
               );
             })}
@@ -2026,7 +2110,8 @@ function GlobalOrderCta({ lang }: { lang: Lang }) {
 /* ------------------------------------------------------------------ */
 /* URL <-> Page mapping (so direct links and refresh work correctly)   */
 /* ------------------------------------------------------------------ */
-const PAGE_SLUGS: readonly Page[] = ['home', 'projects', 'about', 'services', 'contact', 'case-mzshop'];
+const SERVICE_IDS: readonly ServiceId[] = ['landing', 'corporate', 'shop', 'uxui', 'frontend', 'branding', 'launch', 'support', 'seo'];
+const PAGE_SLUGS: readonly Page[] = ['home', 'projects', 'about', 'services', 'contact', 'case-mzshop', ...SERVICE_IDS];
 
 function pageFromLocation(location: string): Page {
   const slug = location.replace(/^\/+/, '').split('?')[0];
@@ -2124,9 +2209,18 @@ export default function Portfolio() {
         )}
         {currentPage === 'services' && (
           <PageWrap pageKey="services">
-            <ServicesPage t={t} lang={savedLang} />
+            <ServicesPage t={t} lang={savedLang} onNavigate={navigate} />
           </PageWrap>
         )}
+        {SERVICE_IDS.includes(currentPage as ServiceId) && (() => {
+          const idx = SERVICES.findIndex((s) => s.id === currentPage);
+          if (idx === -1) return null;
+          return (
+            <PageWrap pageKey={currentPage}>
+              <ServiceDetailPage svc={SERVICES[idx]} index={idx} lang={savedLang} onBack={() => navigate('services')} onNavigate={navigate} />
+            </PageWrap>
+          );
+        })()}
         {currentPage === 'contact' && (
           <PageWrap pageKey="contact">
             <ContactPage t={t} lang={savedLang} />
