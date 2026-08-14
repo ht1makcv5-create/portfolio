@@ -1154,6 +1154,8 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
             ))}
           </div>
         </div>
+
+        <TariffSection lang={lang} serviceName={s.title} />
       </div>
     </div>
   );
@@ -1711,10 +1713,99 @@ function BotOrderForm({ lang }: { lang: Lang }) {
   );
 }
 
-function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate: (page: Page) => void }) {
+function TariffSection({ lang, serviceName }: { lang: Lang; serviceName: string | null }) {
   const [activeTab, setActiveTab] = useState(0);
-  const railRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
+
+  return (
+    <div className="divider-gradient mt-20 pt-14">
+      <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.4em] text-[hsl(270_70%_72%)]">
+        {lang === 'uk' ? 'ОРІЄНТОВНІ ТАРИФИ' : 'SAMPLE PRICING'}
+      </p>
+      <h2
+        className="font-sans font-bold leading-[0.95] text-[hsl(var(--foreground))]"
+        style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)' }}
+      >
+        {lang === 'uk' ? 'Що тобі потрібно?' : 'What do you need?'}
+      </h2>
+
+      <div className="mt-10 grid gap-3 md:grid-cols-3">
+        {TARIFF_TABS.map((tab, i) => {
+          const tb = tab[lang];
+          return (
+            <motion.button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(i)}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              aria-pressed={activeTab === i}
+              data-testid={`button-tariff-tab-${tab.id}`}
+              className={`border p-5 text-left transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${
+                activeTab === i ? 'border-[hsl(270_70%_60%)] bg-[hsl(270_70%_60%_/_0.08)]' : 'border-[hsl(var(--border))]'
+              }`}
+            >
+              <span className="font-sans text-xs tracking-[0.2em] text-[hsl(270_70%_72%)]">0{i + 1}</span>
+              <p className="mt-2 font-sans text-xl font-bold text-[hsl(var(--foreground))]">{tb.tabLabel}</p>
+            </motion.button>
+          );
+        })}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {(() => {
+          const tab = TARIFF_TABS[activeTab];
+          const tb = tab[lang];
+          return (
+            <motion.div
+              key={tab.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              data-testid={`card-tariff-${tab.id}`}
+              className="mt-6 grid gap-10 border border-[hsl(var(--border))] p-8 transition-shadow duration-500 hover:shadow-[0_0_60px_-20px_hsl(270_70%_60%_/_0.5)] md:grid-cols-2 md:p-12"
+            >
+              <div>
+                <h3 className="font-sans text-4xl font-bold text-[hsl(var(--foreground))] md:text-5xl">{tb.name}</h3>
+                <p className="mt-3 max-w-xs font-serif text-lg italic leading-snug text-[hsl(var(--muted-foreground))]">
+                  {tb.tagline}
+                </p>
+                <p className="mt-6 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(270_70%_72%)]">
+                  {lang === 'uk' ? 'ТЕРМІН' : 'TIMELINE'}: {tb.term}
+                </p>
+                <motion.button
+                  type="button"
+                  onClick={() => {
+                    const params = new URLSearchParams({ service: serviceName || tb.name, pkg: tb.tabLabel });
+                    setLocation(`/contact?${params.toString()}`);
+                  }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  data-testid="button-tariff-discuss"
+                  className="mt-8 inline-flex items-center gap-3 bg-[hsl(270_70%_60%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(270_70%_60%)]"
+                >
+                  {lang === 'uk' ? 'Обговорити проєкт' : 'Discuss the project'} →
+                </motion.button>
+              </div>
+              <ul className="space-y-3 self-center">
+                {tb.items.map((item) => (
+                  <li key={item} className="flex gap-2.5 font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
+                    <span className="mt-0.5 text-[hsl(270_70%_72%)]" aria-hidden>✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate: (page: Page) => void }) {
+  const railRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: railRef, offset: ['start center', 'end center'] });
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 22, mass: 0.4 });
   const dotTopPercent = useTransform(smoothProgress, [0, 1], [0, 100]);
@@ -1832,90 +1923,7 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
           </div>
         </div>
 
-        {/* Tariff tabs */}
-        <div className="divider-gradient mt-20 pt-14">
-          <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.4em] text-[hsl(270_70%_72%)]">
-            {lang === 'uk' ? 'ОРІЄНТОВНІ ТАРИФИ' : 'SAMPLE PRICING'}
-          </p>
-          <h2
-            className="font-sans font-bold leading-[0.95] text-[hsl(var(--foreground))]"
-            style={{ fontSize: 'clamp(2.2rem, 6vw, 4rem)' }}
-          >
-            {lang === 'uk' ? 'Що тобі потрібно?' : 'What do you need?'}
-          </h2>
-
-          <div className="mt-10 grid gap-3 md:grid-cols-3">
-            {TARIFF_TABS.map((tab, i) => {
-              const tb = tab[lang];
-              return (
-                <motion.button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(i)}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  aria-pressed={activeTab === i}
-                  data-testid={`button-tariff-tab-${tab.id}`}
-                  className={`border p-5 text-left transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${
-                    activeTab === i ? 'border-[hsl(270_70%_60%)] bg-[hsl(270_70%_60%_/_0.08)]' : 'border-[hsl(var(--border))]'
-                  }`}
-                >
-                  <span className="font-sans text-xs tracking-[0.2em] text-[hsl(270_70%_72%)]">0{i + 1}</span>
-                  <p className="mt-2 font-sans text-xl font-bold text-[hsl(var(--foreground))]">{tb.tabLabel}</p>
-                </motion.button>
-              );
-            })}
-          </div>
-
-          <AnimatePresence mode="wait">
-            {(() => {
-              const tab = TARIFF_TABS[activeTab];
-              const tb = tab[lang];
-              return (
-                <motion.div
-                  key={tab.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  data-testid={`card-tariff-${tab.id}`}
-                  className="mt-6 grid gap-10 border border-[hsl(var(--border))] p-8 transition-shadow duration-500 hover:shadow-[0_0_60px_-20px_hsl(270_70%_60%_/_0.5)] md:grid-cols-2 md:p-12"
-                >
-                  <div>
-                    <h3 className="font-sans text-4xl font-bold text-[hsl(var(--foreground))] md:text-5xl">{tb.name}</h3>
-                    <p className="mt-3 max-w-xs font-serif text-lg italic leading-snug text-[hsl(var(--muted-foreground))]">
-                      {tb.tagline}
-                    </p>
-                    <p className="mt-6 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(270_70%_72%)]">
-                      {lang === 'uk' ? 'ТЕРМІН' : 'TIMELINE'}: {tb.term}
-                    </p>
-                    <motion.button
-                      type="button"
-                      onClick={() => {
-                        const params = new URLSearchParams({ service: tb.name, pkg: tb.tabLabel });
-                        setLocation(`/contact?${params.toString()}`);
-                      }}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      data-testid="button-tariff-discuss"
-                      className="mt-8 inline-flex items-center gap-3 bg-[hsl(270_70%_60%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(270_70%_60%)]"
-                    >
-                      {lang === 'uk' ? 'Обговорити проєкт' : 'Discuss the project'} →
-                    </motion.button>
-                  </div>
-                  <ul className="space-y-3 self-center">
-                    {tb.items.map((item) => (
-                      <li key={item} className="flex gap-2.5 font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-                        <span className="mt-0.5 text-[hsl(270_70%_72%)]" aria-hidden>✓</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              );
-            })()}
-          </AnimatePresence>
-        </div>
+        <TariffSection lang={lang} serviceName={null} />
 
         <BotOrderForm lang={lang} />
 
