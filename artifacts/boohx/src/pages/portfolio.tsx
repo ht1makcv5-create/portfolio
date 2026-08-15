@@ -7,6 +7,7 @@ import Lenis from 'lenis';
 const MiniGhost = lazy(() => import('@/components/MiniGhost'));
 const AmbientSparkles = lazy(() => import('@/components/AmbientSparkles'));
 const OrderWizard = lazy(() => import('@/components/OrderWizard'));
+import MeshArt from '@/components/MeshArt';
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -736,6 +737,7 @@ function HomePage({ t, lang, onViewWork }: { t: Copy; lang: Lang; onViewWork: ()
     <div className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
+        <MeshArt className="absolute inset-0 h-full w-full opacity-70" />
         <motion.div
           className="absolute left-1/2 top-1/2 h-[70vw] w-[70vw] max-h-[900px] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.09) 0%, transparent 65%)' }}
@@ -1330,7 +1332,8 @@ function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
 /* ------------------------------------------------------------------ */
 function AboutPage({ t, lang, onContact }: { t: Copy; lang: Lang; onContact: () => void }) {
   return (
-    <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
+    <div className="relative min-h-[100dvh] w-full bg-[hsl(var(--background))]">
+      <MeshArt className="pointer-events-none absolute right-0 top-0 -z-10 h-[600px] w-[600px] opacity-40" />
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
         {/* Section label */}
         <motion.div
