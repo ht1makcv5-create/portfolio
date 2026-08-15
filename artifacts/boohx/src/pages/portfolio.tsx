@@ -1145,7 +1145,7 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
                 transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
                 data-testid={`stat-service-detail-${i}`}
               >
-                <p className="font-sans text-4xl font-bold leading-none text-[hsl(var(--foreground))]">
+                <p className="font-mono text-4xl font-medium leading-none tracking-tight text-[hsl(var(--foreground))]">
                   {stat.value}
                   <span className="text-[hsl(270_70%_72%)]">.</span>
                 </p>
@@ -1818,6 +1818,11 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
     <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       {/* Purple-tinted "what do you need" hero */}
       <div className="relative flex flex-col items-center overflow-hidden px-6 pb-24 pt-32 text-center md:pt-40">
+        <div
+          className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.14] grayscale"
+          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1711577423906-41ec065a98c9?q=80&w=1600&auto=format&fit=crop)' }}
+        />
+        <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
         <div
           className="pointer-events-none absolute -top-20 left-1/2 -z-10 -translate-x-1/2 rounded-full blur-3xl"
           style={{
