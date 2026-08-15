@@ -1866,19 +1866,31 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
           <span className="h-px flex-1 bg-[hsl(var(--border))]" />
         </motion.div>
 
-        {/* Alternating slides with a centered, continuously-moving gauge line */}
+        {/* Alternating slides with a centered gauge that fills as you scroll */}
         <div ref={railRef} className="relative">
-          {/* Center line — runs through the whole section */}
-          <div className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-[hsl(var(--border))] md:block" aria-hidden />
-          {/* Soft glow trailing the dot */}
+          {/* Empty track — runs through the whole section */}
+          <div className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-[3px] -translate-x-1/2 rounded-full bg-[hsl(var(--border))] md:block" aria-hidden />
+          {/* Filled portion — grows downward from the top as you scroll */}
           <motion.div
-            className="pointer-events-none absolute left-1/2 hidden h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl md:block"
-            style={{ top: dotTop, background: 'radial-gradient(circle, hsl(270 75% 68% / 0.35) 0%, transparent 70%)' }}
+            className="pointer-events-none absolute left-1/2 top-0 hidden w-[3px] -translate-x-1/2 rounded-full md:block"
+            style={{
+              height: '100%',
+              scaleY: smoothProgress,
+              transformOrigin: 'top',
+              background: 'linear-gradient(to bottom, hsl(270 80% 72%), hsl(255 75% 58%))',
+              boxShadow: '0 0 12px 1px hsl(270 75% 68% / 0.45)',
+            }}
             aria-hidden
           />
-          {/* The single continuously-moving indicator dot */}
+          {/* Soft glow trailing the fill tip */}
           <motion.div
-            className="pointer-events-none absolute left-1/2 hidden h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(270_75%_68%)] shadow-[0_0_16px_4px_hsl(270_75%_68%_/_0.6)] md:block"
+            className="pointer-events-none absolute left-1/2 hidden h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl md:block"
+            style={{ top: dotTop, background: 'radial-gradient(circle, hsl(270 75% 68% / 0.4) 0%, transparent 70%)' }}
+            aria-hidden
+          />
+          {/* Bulb at the current fill level */}
+          <motion.div
+            className="pointer-events-none absolute left-1/2 hidden h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(270_80%_72%)] shadow-[0_0_18px_5px_hsl(270_75%_68%_/_0.65)] md:block"
             style={{ top: dotTop }}
             aria-hidden
           />
