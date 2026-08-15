@@ -782,8 +782,8 @@ function HomePage({ t, lang, onViewWork }: { t: Copy; lang: Lang; onViewWork: ()
               initial={{ opacity: 0, y: 90, rotate: -3 }}
               animate={{ opacity: 1, y: 0, rotate: 0 }}
               transition={{ duration: 1.1, delay: 0.35 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[19vw] md:text-[16vw]"
-              style={i === letters.length - 1 ? { color: 'hsl(var(--primary) / 0.85)' } : undefined}
+              className="text-[19vw] bg-gradient-to-b from-[hsl(var(--foreground))] to-[hsl(var(--foreground)_/_0.55)] bg-clip-text text-transparent md:text-[16vw]"
+              style={i === letters.length - 1 ? { color: 'hsl(var(--primary) / 0.85)', WebkitTextFillColor: 'hsl(var(--primary) / 0.85)' } : undefined}
             >
               {letter}
             </motion.span>
@@ -846,7 +846,7 @@ function ProjectCard({ t, onOpen }: { t: Copy; onOpen: () => void }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       data-testid="link-project-mzshop"
-      className="group relative block w-full border-y border-[hsl(var(--border))] py-10 text-left transition-shadow duration-500 hover:shadow-[0_0_60px_-14px_hsl(var(--primary)_/_0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-14"
+      className="group relative block w-full border-y border-[hsl(var(--border))] py-10 text-left transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_0_60px_-14px_hsl(var(--primary)_/_0.5)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] md:py-14"
     >
       <div className="flex flex-col gap-8 md:flex-row md:items-center md:gap-14">
         <div className="flex items-start gap-6 md:w-1/2">
@@ -1349,7 +1349,7 @@ function AboutPage({ t, lang, onContact }: { t: Copy; lang: Lang; onContact: () 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16 flex flex-col items-center gap-5 border border-[hsl(var(--border))] px-8 py-12 text-center transition-shadow duration-500 hover:shadow-[0_0_60px_-20px_hsl(var(--primary)_/_0.4)] md:mb-24"
+          className="mb-16 flex flex-col items-center gap-5 border border-[hsl(var(--border))] px-8 py-12 text-center transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_0_60px_-20px_hsl(var(--primary)_/_0.4)] md:mb-24"
         >
           <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[hsl(var(--primary)_/_0.5)] bg-[hsl(var(--primary)_/_0.08)] font-serif text-3xl italic text-[hsl(var(--primary))]">
             B
