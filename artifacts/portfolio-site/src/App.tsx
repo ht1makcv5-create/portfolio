@@ -11,6 +11,7 @@ import {
 } from '@workspace/api-client-react';
 import type { Request as StudioRequest } from '@workspace/api-client-react';
 import NotFound from '@/pages/not-found';
+import Services from '@/pages/Services';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Router as WouterRouter } from 'wouter';
@@ -30,6 +31,7 @@ function PublicNav() {
       <Link href="/" data-testid="link-logo" className="hover:scale-110 transition-transform duration-300"><Mark /></Link>
       <nav className={`${open ? 'flex' : 'hidden'} absolute left-5 right-5 top-16 flex-col gap-5 rounded-md border border-border bg-card p-5 text-sm md:static md:flex md:flex-row md:items-center md:gap-8 md:border-0 md:bg-transparent md:p-0 transition-all duration-300 ${open ? 'scale-in' : ''}`}>
         <a href="#work" data-testid="link-work" className="hover:text-accent transition-all duration-300 hover:translate-x-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full">Наші роботи</a>
+        <Link href="/services" data-testid="link-services" className="hover:text-accent transition-all duration-300 hover:translate-x-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full">Послуги</Link>
         <a href="#approach" data-testid="link-approach" className="hover:text-accent transition-all duration-300 hover:translate-x-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full">Підхід</a>
         <a href="#contact" data-testid="link-contact" className="hover:text-accent transition-all duration-300 hover:translate-x-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full">Обговорити проєкт</a>
         <Link href="/admin" data-testid="link-admin" className="mono text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-accent transition-all duration-300 hover:scale-105">Кабінет студії ↗</Link>
@@ -98,19 +100,37 @@ function Portfolio() {
   return <div className="grain min-h-[100dvh] overflow-hidden bg-background">
     <PublicNav />
     <main>
-      <section className="relative px-5 pb-24 pt-36 md:px-10 md:pb-36 md:pt-48">
+      <section className="relative px-5 pb-24 pt-36 md:px-10 md:pb-36 md:pt-48 overflow-hidden">
         <div className="mx-auto grid max-w-[1380px] items-end gap-14 md:grid-cols-[1.1fr_.9fr]">
           <div className="reveal">
             <p className="mono mb-7 text-[10px] uppercase tracking-[.2em] text-accent animate-pulse">Креативна студія · Київ / будь-де</p>
             <h1 className="max-w-4xl text-[clamp(4rem,10vw,10.5rem)] leading-[.82] tracking-[-.075em] text-shadow-soft">Створюємо<br /><span className="serif font-normal italic text-accent gradient-text">сайти</span> з характером.</h1>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link href="/services" className="inline-flex items-center gap-2 bg-accent px-6 py-3 text-sm font-semibold text-background transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                Наші послуги <ArrowUpRight size={16} />
+              </Link>
+              <a href="#work" className="inline-flex items-center gap-2 border-2 border-foreground px-6 py-3 text-sm font-semibold transition-all duration-300 hover:border-accent hover:text-accent hover:translate-x-1">
+                Дивитись роботи
+              </a>
+            </div>
           </div>
           <div className="reveal max-w-sm pb-2 md:justify-self-end" style={{ animationDelay: '.12s' }}>
             <p className="text-lg leading-relaxed text-muted-foreground">Yana — невелика студія для ідей із характером. Створюємо бренди, сайти та цифрові враження, які запамʼятовуються.</p>
-            <a href="#contact" data-testid="link-hero-start" className="mt-9 inline-flex items-center gap-3 border-b-2 border-foreground pb-2 text-sm font-semibold hover:border-accent hover:text-accent transition-all duration-300 hover:translate-x-1">Розкажіть про свій проєкт <ArrowUpRight size={16} /></a>
+            <div className="mt-8 grid grid-cols-2 gap-4 pt-8 border-t border-border">
+              <div>
+                <div className="serif text-4xl gradient-text">50+</div>
+                <p className="mt-2 text-sm text-muted-foreground">Проєктів</p>
+              </div>
+              <div>
+                <div className="serif text-4xl gradient-text">5+</div>
+                <p className="mt-2 text-sm text-muted-foreground">Років</p>
+              </div>
+            </div>
           </div>
         </div>
         <div className="pointer-events-none absolute -right-24 top-48 hidden h-80 w-80 rounded-full border-2 border-accent/40 md:block float glow-accent" />
         <div className="pointer-events-none absolute -right-8 top-64 hidden h-48 w-48 rounded-full bg-secondary md:block scale-in" style={{ animationDelay: '.3s' }} />
+        <div className="pointer-events-none absolute -left-32 top-96 hidden h-64 w-64 rounded-full bg-accent/10 md:block blur-3xl" />
       </section>
 
       <section id="work" className="border-y border-border bg-muted/40 px-5 py-16 md:px-10 md:py-24">
@@ -230,7 +250,7 @@ function RequestRow({ request, onStatus, index }: { request: StudioRequest; onSt
 }
 
 function Router() {
-  return <Switch><Route path="/" component={Portfolio} /><Route path="/admin" component={Admin} /><Route component={NotFound} /></Switch>;
+  return <Switch><Route path="/" component={Portfolio} /><Route path="/services" component={Services} /><Route path="/admin" component={Admin} /><Route component={NotFound} /></Switch>;
 }
 function App() { return <QueryClientProvider client={queryClient}><TooltipProvider><WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}><Router /></WouterRouter><GlobalOrderCta /><Toaster /></TooltipProvider></QueryClientProvider>; }
 export default App;
