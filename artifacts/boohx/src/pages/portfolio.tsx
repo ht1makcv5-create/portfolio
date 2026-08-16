@@ -1333,6 +1333,11 @@ function CaseMzshopPage({ lang, onBack }: { lang: Lang; onBack: () => void }) {
 function AboutPage({ t, lang, onContact }: { t: Copy; lang: Lang; onContact: () => void }) {
   return (
     <div className="relative min-h-[100dvh] w-full bg-[hsl(var(--background))]">
+      <div
+        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.1] grayscale"
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop)' }}
+      />
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
       <MeshArt className="pointer-events-none absolute right-0 top-0 -z-10 h-[600px] w-[600px] opacity-40" />
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
         {/* Section label */}
@@ -1359,7 +1364,7 @@ function AboutPage({ t, lang, onContact }: { t: Copy; lang: Lang; onContact: () 
           </div>
           <div>
             <p className="font-serif text-2xl italic text-[hsl(var(--foreground))]">boohx</p>
-            <p className="mt-1 font-sans text-xs uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
+            <p className="mt-1 font-sans text-xs font-bold uppercase tracking-[0.3em] text-[hsl(var(--muted-foreground))]">
               {lang === 'uk' ? 'Засновник · веб-дизайн і розробка' : 'Founder · web design & development'}
             </p>
           </div>
@@ -2207,7 +2212,7 @@ export default function Portfolio() {
 
       <CursorGlow />
 
-      <div className="grid-overlay pointer-events-none fixed inset-0 z-0" aria-hidden />
+      <div className="grid-overlay pointer-events-none fixed inset-0 z-0 hidden md:block" aria-hidden />
       <Suspense fallback={null}>
         <AmbientSparkles />
       </Suspense>
