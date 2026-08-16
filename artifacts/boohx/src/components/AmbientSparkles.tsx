@@ -8,7 +8,7 @@ const PARTICLES = Array.from({ length: 10 }, (_, i) => ({
 
 export default function AmbientSparkles() {
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+    <div className="pointer-events-none fixed inset-0 z-0 hidden overflow-hidden md:block" aria-hidden>
       {PARTICLES.map((p, i) => (
         <span
           key={i}
