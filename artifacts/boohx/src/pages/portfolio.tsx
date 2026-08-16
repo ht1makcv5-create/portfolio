@@ -8,6 +8,7 @@ const MiniGhost = lazy(() => import('@/components/MiniGhost'));
 const AmbientSparkles = lazy(() => import('@/components/AmbientSparkles'));
 const OrderWizard = lazy(() => import('@/components/OrderWizard'));
 import MeshArt from '@/components/MeshArt';
+import BlobArt from '@/components/BlobArt';
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -2028,7 +2029,8 @@ function ContactLinkRow({ href, label, sub, testId }: { href: string; label: str
 
 function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
   return (
-    <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
+    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
+      <BlobArt className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[700px] w-[900px] -translate-x-1/2 opacity-50" />
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
         {/* Section label */}
         <motion.div
