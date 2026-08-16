@@ -25,17 +25,17 @@ function Mark() {
 
 function PublicNav() {
   const [open, setOpen] = useState(false);
-  return <header className="fixed inset-x-0 top-0 z-40 border-b border-border/50 bg-background/90 px-5 py-4 backdrop-blur-md md:px-10 md:py-5">
+  return <header className="fixed inset-x-0 top-0 z-40 border-b border-border/50 bg-background/90 px-5 py-4 backdrop-blur-md md:px-10 md:py-5 transition-all duration-300">
     <div className="mx-auto flex max-w-[1380px] items-center justify-between">
-      <Link href="/" data-testid="link-logo"><Mark /></Link>
-      <nav className={`${open ? 'flex' : 'hidden'} absolute left-5 right-5 top-16 flex-col gap-5 rounded-md border border-border bg-card p-5 text-sm md:static md:flex md:flex-row md:items-center md:gap-8 md:border-0 md:bg-transparent md:p-0`}>
-        <a href="#work" data-testid="link-work" className="hover:text-accent transition-colors">Наші роботи</a>
-        <a href="#approach" data-testid="link-approach" className="hover:text-accent transition-colors">Підхід</a>
-        <a href="#contact" data-testid="link-contact" className="hover:text-accent transition-colors">Обговорити проєкт</a>
-        <Link href="/admin" data-testid="link-admin" className="mono text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-accent">Кабінет студії ↗</Link>
+      <Link href="/" data-testid="link-logo" className="hover:scale-110 transition-transform duration-300"><Mark /></Link>
+      <nav className={`${open ? 'flex' : 'hidden'} absolute left-5 right-5 top-16 flex-col gap-5 rounded-md border border-border bg-card p-5 text-sm md:static md:flex md:flex-row md:items-center md:gap-8 md:border-0 md:bg-transparent md:p-0 transition-all duration-300 ${open ? 'scale-in' : ''}`}>
+        <a href="#work" data-testid="link-work" className="hover:text-accent transition-all duration-300 hover:translate-x-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full">Наші роботи</a>
+        <a href="#approach" data-testid="link-approach" className="hover:text-accent transition-all duration-300 hover:translate-x-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full">Підхід</a>
+        <a href="#contact" data-testid="link-contact" className="hover:text-accent transition-all duration-300 hover:translate-x-1 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-accent after:transition-all after:duration-300 hover:after:w-full">Обговорити проєкт</a>
+        <Link href="/admin" data-testid="link-admin" className="mono text-[10px] uppercase tracking-[.16em] text-muted-foreground hover:text-accent transition-all duration-300 hover:scale-105">Кабінет студії ↗</Link>
       </nav>
       <div className="flex items-center gap-3">
-        <button onClick={() => setOpen(!open)} className="md:hidden" data-testid="button-mobile-menu" aria-label="Toggle menu">{open ? <X size={22} /> : <Menu size={22} />}</button>
+        <button onClick={() => setOpen(!open)} className="md:hidden hover:scale-110 transition-transform duration-300" data-testid="button-mobile-menu" aria-label="Toggle menu">{open ? <X size={22} /> : <Menu size={22} />}</button>
       </div>
     </div>
   </header>;
@@ -48,9 +48,9 @@ function GlobalOrderCta() {
       onClick={() => setOrderOpen(true)}
       data-testid="button-order-site-global"
       aria-label="Відкрити форму замовлення сайту"
-      className="fixed right-4 top-3 z-[60] inline-flex items-center gap-2 border border-[#2b2031]/15 bg-[#e35e50] px-4 py-3 text-[11px] font-bold uppercase tracking-[.08em] text-[#2b2031] shadow-[0_10px_30px_rgba(43,32,49,.2)] transition-transform hover:-translate-y-1 sm:right-8 sm:top-4 sm:px-5 sm:py-3.5 sm:text-xs focus:outline-none focus:ring-2 focus:ring-[#2b2031] focus:ring-offset-2 focus:ring-offset-background"
+      className="fixed right-4 top-3 z-[60] inline-flex items-center gap-2 border border-[#2b2031]/15 bg-[#e35e50] px-4 py-3 text-[11px] font-bold uppercase tracking-[.08em] text-[#2b2031] shadow-[0_10px_30px_rgba(43,32,49,.2)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(227,94,80,.4)] sm:right-8 sm:top-4 sm:px-5 sm:py-3.5 sm:text-xs focus:outline-none focus:ring-2 focus:ring-[#2b2031] focus:ring-offset-2 focus:ring-offset-background hover:scale-105 animate-pulse"
     >
-      Замовити сайт <ArrowUpRight size={15} />
+      Замовити сайт <ArrowUpRight size={15} className="transition-transform group-hover:rotate-45" />
     </button>
     {orderOpen && <OrderPanel onClose={() => setOrderOpen(false)} />}
   </>;
@@ -68,17 +68,17 @@ function OrderPanel({ onClose }: { onClose: () => void }) {
       { onSuccess: () => { setSent(true); setForm({ name: '', contact: '', service: '', budget: '', message: '' }); } },
     );
   };
-  return <div className="fixed inset-0 z-50 flex items-start justify-end bg-[#2b2031]/35 p-3 pt-20 sm:p-5 sm:pt-24" role="dialog" aria-modal="true" data-testid="dialog-order-panel">
-    <div className="max-h-[calc(100dvh-6rem)] w-full max-w-md overflow-y-auto border border-border bg-[#f5e8d0] p-6 text-[#2b2031] shadow-2xl sm:p-8">
-      <div className="mb-7 flex items-start justify-between gap-5"><div><p className="mono text-[10px] uppercase tracking-[.2em] text-[#e35e50]">Нове замовлення</p><h2 className="serif mt-2 text-4xl">Замовити сайт</h2></div><button onClick={onClose} data-testid="button-close-order-panel" className="rounded-full border border-[#2b2031]/20 p-2 hover:bg-[#2b2031]/5"><X size={17} /></button></div>
+  return <div className="fixed inset-0 z-50 flex items-start justify-end bg-[#2b2031]/35 backdrop-blur-sm p-3 pt-20 sm:p-5 sm:pt-24 fade-in" role="dialog" aria-modal="true" data-testid="dialog-order-panel">
+    <div className="max-h-[calc(100dvh-6rem)] w-full max-w-md overflow-y-auto border-2 border-[#e35e50]/30 bg-[#f5e8d0] p-6 text-[#2b2031] shadow-2xl sm:p-8 slide-in-right rounded-sm hover-lift">
+      <div className="mb-7 flex items-start justify-between gap-5"><div><p className="mono text-[10px] uppercase tracking-[.2em] text-[#e35e50] animate-pulse">Нове замовлення</p><h2 className="serif mt-2 text-4xl gradient-text">Замовити сайт</h2></div><button onClick={onClose} data-testid="button-close-order-panel" className="rounded-full border border-[#2b2031]/20 p-2 hover:bg-[#2b2031]/5 transition-all duration-300 hover:rotate-90 hover:scale-110"><X size={17} /></button></div>
       {sent ? <div className="py-8"><span className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-[#e35e50]"><Check size={19} /></span><h3 className="serif text-4xl">Заявку прийнято.</h3><p className="mt-3 text-sm leading-relaxed text-[#2b2031]/65">Дані вже відправлено в робочий Telegram-бот. Ми звʼяжемося з вами за вказаним контактом.</p><button onClick={onClose} data-testid="button-close-sent-panel" className="mt-7 border-b border-[#2b2031] pb-1 text-sm">Закрити</button></div> :
       <form onSubmit={submit} className="space-y-5">
-        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Ваше імʼя</span><input required minLength={2} value={form.name} onChange={e => update('name', e.target.value)} data-testid="input-panel-name" className="w-full border-b border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50]" /></label>
-        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Телефон, Telegram або email</span><input required minLength={3} value={form.contact} onChange={e => update('contact', e.target.value)} data-testid="input-panel-contact" className="w-full border-b border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50]" /></label>
-        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Що потрібно зробити</span><select value={form.service} onChange={e => update('service', e.target.value)} data-testid="select-panel-service" className="w-full border-b border-[#2b2031]/25 bg-[#f5e8d0] py-2 text-sm outline-none focus:border-[#e35e50]"><option value="">Оберіть послугу</option>{services.map(service => <option key={service}>{service}</option>)}</select></label>
-        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60">Коротко про завдання</span><textarea required minLength={5} rows={3} value={form.message} onChange={e => update('message', e.target.value)} data-testid="input-panel-message" className="w-full resize-none border-b border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50]" /></label>
-        {create.isError && <p className="flex items-center gap-2 text-xs text-[#b94035]"><CircleAlert size={14} /> Не вдалося відправити. Спробуйте ще раз.</p>}
-        <button disabled={create.isPending} type="submit" data-testid="button-panel-submit" className="w-full bg-[#e35e50] px-5 py-3 text-sm font-semibold text-[#2b2031] disabled:opacity-50">{create.isPending ? 'Відправляємо…' : 'Відправити'}</button>
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60 transition-all duration-300">Ваше імʼя</span><input required minLength={2} value={form.name} onChange={e => update('name', e.target.value)} data-testid="input-panel-name" className="w-full border-b-2 border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50] transition-all duration-300 hover:border-[#2b2031]/40" /></label>
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60 transition-all duration-300">Телефон, Telegram або email</span><input required minLength={3} value={form.contact} onChange={e => update('contact', e.target.value)} data-testid="input-panel-contact" className="w-full border-b-2 border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50] transition-all duration-300 hover:border-[#2b2031]/40" /></label>
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60 transition-all duration-300">Що потрібно зробити</span><select value={form.service} onChange={e => update('service', e.target.value)} data-testid="select-panel-service" className="w-full border-b-2 border-[#2b2031]/25 bg-[#f5e8d0] py-2 text-sm outline-none focus:border-[#e35e50] transition-all duration-300 hover:border-[#2b2031]/40 cursor-pointer"><option value="">Оберіть послугу</option>{services.map(service => <option key={service}>{service}</option>)}</select></label>
+        <label className="block"><span className="mb-1 block text-xs text-[#2b2031]/60 transition-all duration-300">Коротко про завдання</span><textarea required minLength={5} rows={3} value={form.message} onChange={e => update('message', e.target.value)} data-testid="input-panel-message" className="w-full resize-none border-b-2 border-[#2b2031]/25 bg-transparent py-2 text-sm outline-none focus:border-[#e35e50] transition-all duration-300 hover:border-[#2b2031]/40" /></label>
+        {create.isError && <p className="flex items-center gap-2 text-xs text-[#b94035] fade-in"><CircleAlert size={14} /> Не вдалося відправити. Спробуйте ще раз.</p>}
+        <button disabled={create.isPending} type="submit" data-testid="button-panel-submit" className="w-full bg-[#e35e50] px-5 py-3 text-sm font-semibold text-[#2b2031] disabled:opacity-50 transition-all duration-300 hover:bg-[#e35e50]/90 hover:scale-105 hover:shadow-lg active:scale-95 rounded-sm">{create.isPending ? 'Відправляємо…' : 'Відправити'}</button>
       </form>}
     </div>
   </div>;
@@ -101,26 +101,26 @@ function Portfolio() {
       <section className="relative px-5 pb-24 pt-36 md:px-10 md:pb-36 md:pt-48">
         <div className="mx-auto grid max-w-[1380px] items-end gap-14 md:grid-cols-[1.1fr_.9fr]">
           <div className="reveal">
-            <p className="mono mb-7 text-[10px] uppercase tracking-[.2em] text-accent">Креативна студія · Київ / будь-де</p>
-            <h1 className="max-w-4xl text-[clamp(4rem,10vw,10.5rem)] leading-[.82] tracking-[-.075em]">Створюємо<br /><span className="serif font-normal italic text-accent">сайти</span> з характером.</h1>
+            <p className="mono mb-7 text-[10px] uppercase tracking-[.2em] text-accent animate-pulse">Креативна студія · Київ / будь-де</p>
+            <h1 className="max-w-4xl text-[clamp(4rem,10vw,10.5rem)] leading-[.82] tracking-[-.075em] text-shadow-soft">Створюємо<br /><span className="serif font-normal italic text-accent gradient-text">сайти</span> з характером.</h1>
           </div>
           <div className="reveal max-w-sm pb-2 md:justify-self-end" style={{ animationDelay: '.12s' }}>
             <p className="text-lg leading-relaxed text-muted-foreground">Yana — невелика студія для ідей із характером. Створюємо бренди, сайти та цифрові враження, які запамʼятовуються.</p>
-            <a href="#contact" data-testid="link-hero-start" className="mt-9 inline-flex items-center gap-3 border-b border-foreground pb-2 text-sm font-semibold hover:border-accent hover:text-accent transition-colors">Розкажіть про свій проєкт <ArrowUpRight size={16} /></a>
+            <a href="#contact" data-testid="link-hero-start" className="mt-9 inline-flex items-center gap-3 border-b-2 border-foreground pb-2 text-sm font-semibold hover:border-accent hover:text-accent transition-all duration-300 hover:translate-x-1">Розкажіть про свій проєкт <ArrowUpRight size={16} /></a>
           </div>
         </div>
-        <div className="pointer-events-none absolute -right-24 top-48 hidden h-80 w-80 rounded-full border border-accent/40 md:block" />
-        <div className="pointer-events-none absolute -right-8 top-64 hidden h-48 w-48 rounded-full bg-secondary md:block" />
+        <div className="pointer-events-none absolute -right-24 top-48 hidden h-80 w-80 rounded-full border-2 border-accent/40 md:block float glow-accent" />
+        <div className="pointer-events-none absolute -right-8 top-64 hidden h-48 w-48 rounded-full bg-secondary md:block scale-in" style={{ animationDelay: '.3s' }} />
       </section>
 
       <section id="work" className="border-y border-border bg-muted/40 px-5 py-16 md:px-10 md:py-24">
         <div className="mx-auto max-w-[1380px]">
           <div className="mb-12 flex items-end justify-between"><div><p className="mono mb-3 text-[10px] uppercase tracking-[.2em] text-accent">01 / Наші роботи</p><h2 className="serif text-5xl md:text-7xl">Проєкти, які<br /><i>мають значення.</i></h2></div><span className="mono hidden text-[10px] text-muted-foreground md:block">2021—2026</span></div>
           <div className="grid gap-5 md:grid-cols-[1.35fr_.65fr]">
-            <article className="group min-h-[430px] overflow-hidden bg-[#d95b4f] p-7 text-[#f7e7cc] md:p-10"><div className="flex justify-between text-xs"><span>01 — Identity</span><span>Olha Studio</span></div><div className="mt-24 max-w-xl"><h3 className="serif text-7xl leading-[.8] md:text-9xl">Made<br /><i>slowly.</i></h3><p className="mt-7 max-w-xs text-sm leading-relaxed opacity-80">A tactile identity for a ceramics practice built around patient hands.</p></div><div className="mt-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#f7e7cc] transition-transform group-hover:translate-x-2"><ArrowUpRight size={17} /></div></article>
+            <article className="group min-h-[430px] overflow-hidden bg-[#d95b4f] p-7 text-[#f7e7cc] md:p-10 hover-lift transition-all duration-500 cursor-pointer rounded-sm"><div className="flex justify-between text-xs"><span>01 — Identity</span><span>Olha Studio</span></div><div className="mt-24 max-w-xl"><h3 className="serif text-7xl leading-[.8] md:text-9xl group-hover:tracking-tight transition-all duration-300">Made<br /><i>slowly.</i></h3><p className="mt-7 max-w-xs text-sm leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">A tactile identity for a ceramics practice built around patient hands.</p></div><div className="mt-10 flex h-10 w-10 items-center justify-center rounded-full border border-[#f7e7cc] transition-all duration-300 group-hover:translate-x-2 group-hover:bg-[#f7e7cc] group-hover:text-[#d95b4f]"><ArrowUpRight size={17} /></div></article>
             <div className="grid gap-5">
-              <article className="group min-h-[205px] bg-[#dcb65c] p-7 text-[#2b2031]"><div className="flex justify-between text-xs"><span>02 — Editorial</span><span>Vatra Journal</span></div><h3 className="serif mt-14 text-5xl leading-[.8]">A journal for<br /><i>the in-between.</i></h3><div className="mt-5 flex justify-end transition-transform group-hover:translate-x-2"><ArrowUpRight size={18} /></div></article>
-              <article className="group min-h-[205px] bg-[#4f6f7a] p-7 text-[#f6e8cf]"><div className="flex justify-between text-xs"><span>03 — Digital</span><span>Forma Objects</span></div><h3 className="serif mt-14 text-5xl leading-[.8]">Objects with<br /><i>a point of view.</i></h3><div className="mt-5 flex justify-end transition-transform group-hover:translate-x-2"><ArrowUpRight size={18} /></div></article>
+              <article className="group min-h-[205px] bg-[#dcb65c] p-7 text-[#2b2031] hover-lift transition-all duration-500 cursor-pointer rounded-sm"><div className="flex justify-between text-xs"><span>02 — Editorial</span><span>Vatra Journal</span></div><h3 className="serif mt-14 text-5xl leading-[.8] group-hover:tracking-tight transition-all duration-300">A journal for<br /><i>the in-between.</i></h3><div className="mt-5 flex justify-end transition-all duration-300 group-hover:translate-x-2 group-hover:scale-110"><ArrowUpRight size={18} /></div></article>
+              <article className="group min-h-[205px] bg-[#4f6f7a] p-7 text-[#f6e8cf] hover-lift transition-all duration-500 cursor-pointer rounded-sm"><div className="flex justify-between text-xs"><span>03 — Digital</span><span>Forma Objects</span></div><h3 className="serif mt-14 text-5xl leading-[.8] group-hover:tracking-tight transition-all duration-300">Objects with<br /><i>a point of view.</i></h3><div className="mt-5 flex justify-end transition-all duration-300 group-hover:translate-x-2 group-hover:scale-110"><ArrowUpRight size={18} /></div></article>
             </div>
           </div>
         </div>
