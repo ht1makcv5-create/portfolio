@@ -979,7 +979,12 @@ function BotCard({ num, handle, tagUk, tagEn, titleUk, titleEn, descUk, descEn, 
 
 function ProjectsPage({ t, lang, onOpenCase }: { t: Copy; lang: Lang; onOpenCase: () => void }) {
   return (
-    <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
+    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
+      <div
+        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.12]"
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1690321607729-bce901c77324?q=80&w=1600&auto=format&fit=crop)' }}
+      />
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
 
         {/* — Sites section label — */}
