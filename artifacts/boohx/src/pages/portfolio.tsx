@@ -621,6 +621,14 @@ function TopNav({
   onToggleLang: () => void;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const navItems: { page: Page; label: string }[] = [
     { page: 'home', label: lang === 'uk' ? 'Головна' : 'Home' },
@@ -639,7 +647,11 @@ function TopNav({
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 md:px-10 md:py-6">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-5 transition-all duration-300 md:px-10 md:py-6 ${
+          scrolled ? 'border-b border-[hsl(var(--border))] bg-[hsl(var(--background)_/_0.7)] backdrop-blur-md' : ''
+        }`}
+      >
         {/* Logo */}
         <motion.button
           onClick={() => onNavigate('home')}
