@@ -750,6 +750,10 @@ function HomePage({ t, lang, onViewWork }: { t: Copy; lang: Lang; onViewWork: ()
     <div className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.22] grayscale"
+          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1638272181967-7d3772a91265?q=80&w=1600&auto=format&fit=crop)' }}
+        />
         <MeshArt className="absolute inset-0 h-full w-full opacity-70" />
         <motion.div
           className="absolute left-1/2 top-1/2 h-[70vw] w-[70vw] max-h-[900px] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full"
@@ -981,7 +985,7 @@ function ProjectsPage({ t, lang, onOpenCase }: { t: Copy; lang: Lang; onOpenCase
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
       <div
-        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.12]"
+        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.3]"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1690321607729-bce901c77324?q=80&w=1600&auto=format&fit=crop)' }}
       />
       <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
@@ -1352,7 +1356,7 @@ function AboutPage({ t, lang, onContact }: { t: Copy; lang: Lang; onContact: () 
   return (
     <div className="relative min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div
-        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.1] grayscale"
+        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.28] grayscale"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop)' }}
       />
       <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
@@ -1842,7 +1846,7 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
       {/* Purple-tinted "what do you need" hero */}
       <div className="relative flex flex-col items-center overflow-hidden px-6 pb-24 pt-32 text-center md:pt-40">
         <div
-          className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.14] grayscale"
+          className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.32] grayscale"
           style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1711577423906-41ec065a98c9?q=80&w=1600&auto=format&fit=crop)' }}
         />
         <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
@@ -2047,6 +2051,11 @@ function ContactLinkRow({ href, label, sub, testId }: { href: string; label: str
 function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
+      <div
+        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.25] grayscale"
+        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1651870364199-fc5f9f46ac85?q=80&w=1600&auto=format&fit=crop)' }}
+      />
+      <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
       <BlobArt className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[700px] w-[900px] -translate-x-1/2 opacity-50" />
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
         {/* Section label */}
