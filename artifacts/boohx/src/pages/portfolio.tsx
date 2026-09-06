@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { ReactNode, FormEvent } from 'react';
-import { motion, useMotionValue, useSpring, useScroll, useTransform, useMotionTemplate, AnimatePresence } from 'framer-motion';
+import { motion, useSpring, useScroll, useTransform, useMotionTemplate, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import Lenis from 'lenis';
 
@@ -416,26 +416,13 @@ const SERVICES = [
 /* Cursor glow                                                         */
 /* ------------------------------------------------------------------ */
 function CursorGlow() {
-  const x = useMotionValue(-200);
-  const y = useMotionValue(-200);
-  const springX = useSpring(x, { damping: 30, stiffness: 200, mass: 0.4 });
-  const springY = useSpring(y, { damping: 30, stiffness: 200, mass: 0.4 });
-
-  useEffect(() => {
-    const move = (e: MouseEvent) => { x.set(e.clientX); y.set(e.clientY); };
-    window.addEventListener('mousemove', move);
-    return () => window.removeEventListener('mousemove', move);
-  }, [x, y]);
-
   return (
     <motion.div
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[60] hidden h-[340px] w-[340px] rounded-full mix-blend-screen md:block"
+      className="pointer-events-none fixed right-[8%] top-[18%] z-[60] hidden h-[380px] w-[380px] rounded-full mix-blend-screen md:block"
+      animate={{ scale: [1, 1.06, 1], opacity: [0.5, 0.7, 0.5] }}
+      transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       style={{
-        translateX: springX,
-        translateY: springY,
-        x: '-50%',
-        y: '-50%',
         background: 'radial-gradient(circle, hsl(var(--primary) / 0.10) 0%, hsl(var(--primary) / 0.03) 45%, transparent 70%)',
       }}
     />
@@ -743,7 +730,7 @@ function PageWrap({ children, pageKey }: { children: ReactNode; pageKey: string 
 /* ------------------------------------------------------------------ */
 /* HOME page                                                           */
 /* ------------------------------------------------------------------ */
-function HomePage({ t, lang, onViewWork }: { t: Copy; lang: Lang; onViewWork: () => void }) {
+function HomePage({ t, lang, onViewWork, onNavigate }: { t: Copy; lang: Lang; onViewWork: () => void; onNavigate: (page: Page) => void }) {
   const letters = 'boohx'.split('');
 
   return (
@@ -838,16 +825,73 @@ function HomePage({ t, lang, onViewWork }: { t: Copy; lang: Lang; onViewWork: ()
         </motion.button>
       </div>
 
-      {/* Bottom descriptor */}
-      <motion.div
+      {/* Section number */}
+      <motion.span
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.6 }}
-        className="absolute bottom-8 right-8 z-10 hidden md:flex items-center gap-2 font-sans text-[10px] uppercase tracking-[0.4em] text-[hsl(var(--muted-foreground))]"
+        animate={{ opacity: 0.35 }}
+        transition={{ duration: 1, delay: 0.6 }}
+        className="absolute left-8 top-[28%] z-10 hidden font-serif text-4xl italic text-[hsl(var(--muted-foreground))] md:block"
+        aria-hidden
       >
-        <span className="text-[hsl(var(--primary))]">веб-дизайн</span>
-        <span className="opacity-30">·</span>
-        <span>розробка</span>
+        01
+      </motion.span>
+
+      {/* Bottom-left: editorial services card */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 1.3, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute bottom-8 left-8 z-10 hidden w-[370px] border border-[hsl(var(--border))] bg-[hsl(var(--background)_/_0.6)] p-5 backdrop-blur-sm md:block"
+      >
+        <div className="flex items-center justify-between">
+          <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-[hsl(var(--primary))]">
+            {lang === 'uk' ? 'СТВОРЮЄМО ЦИФРОВІ ІСТОРІЇ' : 'WE CRAFT DIGITAL STORIES'}
+          </span>
+          <span className="font-mono text-[10px] text-[hsl(var(--muted-foreground))]">01 — 03</span>
+        </div>
+        <div className="mt-3 flex items-baseline justify-between border-t border-[hsl(var(--border))] pt-3">
+          <div className="font-serif text-lg italic leading-tight text-[hsl(var(--foreground))]">
+            <p>{lang === 'uk' ? 'Сайти' : 'Websites'}</p>
+            <p>{lang === 'uk' ? 'Брендинг' : 'Branding'}</p>
+            <p>Motion</p>
+          </div>
+          <span className="max-w-[110px] text-right font-sans text-[11px] text-[hsl(var(--muted-foreground))]">
+            {lang === 'uk' ? 'від ідеї — до враження' : 'from idea to impression'}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate('services')}
+          data-testid="link-home-services-card"
+          className="mt-4 flex items-center gap-1.5 font-sans text-[10px] uppercase tracking-[0.2em] text-[hsl(var(--muted-foreground))] transition-colors hover:text-[hsl(var(--foreground))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+        >
+          {lang === 'uk' ? 'Дивитися підхід' : 'See the approach'} ↘
+        </button>
+      </motion.div>
+
+      {/* Bottom-right: CTA zone */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute bottom-8 right-8 z-10 hidden items-center gap-5 md:flex"
+      >
+        <div className="text-right">
+          <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))]">
+            {lang === 'uk' ? 'Є ІДЕЯ ДЛЯ ПРОЄКТУ?' : 'HAVE A PROJECT IN MIND?'}
+          </p>
+          <p className="mt-1 font-sans text-sm font-semibold text-[hsl(var(--foreground))]">
+            {lang === 'uk' ? 'Зробімо щось особливе' : "Let's make something special"}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onNavigate('contact')}
+          data-testid="link-home-order-cta"
+          className="whitespace-nowrap border border-[hsl(var(--primary)_/_0.5)] px-5 py-3 font-sans text-[11px] uppercase tracking-[0.2em] text-[hsl(var(--primary))] transition-colors hover:bg-[hsl(var(--primary)_/_0.08)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))]"
+        >
+          {lang === 'uk' ? 'Замовити сайт' : 'Order a website'} ↗
+        </button>
       </motion.div>
     </div>
   );
@@ -2250,7 +2294,7 @@ export default function Portfolio() {
       <AnimatePresence mode="wait">
         {currentPage === 'home' && (
           <PageWrap pageKey="home">
-            <HomePage t={t} lang={savedLang} onViewWork={() => navigate('projects')} />
+            <HomePage t={t} lang={savedLang} onViewWork={() => navigate('projects')} onNavigate={navigate} />
           </PageWrap>
         )}
         {currentPage === 'projects' && (
