@@ -7,8 +7,6 @@ import Lenis from 'lenis';
 const MiniGhost = lazy(() => import('@/components/MiniGhost'));
 const AmbientSparkles = lazy(() => import('@/components/AmbientSparkles'));
 const OrderWizard = lazy(() => import('@/components/OrderWizard'));
-import MeshArt from '@/components/MeshArt';
-import BlobArt from '@/components/BlobArt';
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -737,11 +735,6 @@ function HomePage({ t, lang, onViewWork, onNavigate }: { t: Copy; lang: Lang; on
     <div className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.22] grayscale"
-          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1638272181967-7d3772a91265?q=80&w=1600&auto=format&fit=crop)' }}
-        />
-        <MeshArt className="absolute inset-0 h-full w-full opacity-70" />
         <motion.div
           className="absolute left-1/2 top-1/2 h-[70vw] w-[70vw] max-h-[900px] max-w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.09) 0%, transparent 65%)' }}
@@ -1027,12 +1020,7 @@ function BotCard({ num, handle, tagUk, tagEn, titleUk, titleEn, descUk, descEn, 
 
 function ProjectsPage({ t, lang, onOpenCase }: { t: Copy; lang: Lang; onOpenCase: () => void }) {
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
-      <div
-        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.3]"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1690321607729-bce901c77324?q=80&w=1600&auto=format&fit=crop)' }}
-      />
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
+    <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
 
         {/* — Sites section label — */}
@@ -1124,7 +1112,7 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
       <div
         className="pointer-events-none absolute left-0 top-0 -z-10 h-[480px] w-full"
         style={{
-          background: 'radial-gradient(ellipse 55% 60% at 25% 20%, rgba(124,92,255,0.22) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 55% 60% at 25% 20%, rgba(56,150,110,0.22) 0%, transparent 70%)',
         }}
         aria-hidden
       />
@@ -1147,7 +1135,7 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
           {' / '}
           <span className="text-[hsl(var(--foreground))]">{s.title}</span>
         </motion.p>
-        <p className="mb-10 font-sans text-[11px] uppercase tracking-[0.3em] text-[hsl(270_70%_72%)]">
+        <p className="mb-10 font-sans text-[11px] uppercase tracking-[0.3em] text-[hsl(150_45%_58%)]">
           {isUk ? 'ПОСЛУГА' : 'SERVICE'} / 0{index + 1}
         </p>
 
@@ -1183,7 +1171,7 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.35 }}
-              className="mt-10 inline-flex items-center gap-3 bg-[hsl(270_70%_60%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(270_70%_60%)]"
+              className="mt-10 inline-flex items-center gap-3 bg-[hsl(150_50%_42%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(150_50%_42%)]"
             >
               {isUk ? 'Обговорити проєкт' : 'Discuss the project'} →
             </motion.button>
@@ -1213,7 +1201,7 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
               >
                 <p className="font-mono text-4xl font-medium leading-none tracking-tight text-[hsl(var(--foreground))]">
                   {stat.value}
-                  <span className="text-[hsl(270_70%_72%)]">.</span>
+                  <span className="text-[hsl(150_45%_58%)]">.</span>
                 </p>
                 <p className="mt-2 max-w-[10rem] font-sans text-xs uppercase tracking-[0.15em] text-[hsl(var(--muted-foreground))]">
                   {stat.label}
@@ -1404,7 +1392,6 @@ function AboutPage({ t, lang, onContact }: { t: Copy; lang: Lang; onContact: () 
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop)' }}
       />
       <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
-      <MeshArt className="pointer-events-none absolute right-0 top-0 -z-10 h-[600px] w-[600px] opacity-40" />
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
         {/* Section label */}
         <motion.div
@@ -1793,7 +1780,7 @@ function TariffSection({ lang, serviceName }: { lang: Lang; serviceName: string 
 
   return (
     <div className="divider-gradient mt-20 pt-14">
-      <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.4em] text-[hsl(270_70%_72%)]">
+      <p className="mb-2 font-sans text-[11px] uppercase tracking-[0.4em] text-[hsl(150_45%_58%)]">
         {lang === 'uk' ? 'ОРІЄНТОВНІ ТАРИФИ' : 'SAMPLE PRICING'}
       </p>
       <h2
@@ -1816,10 +1803,10 @@ function TariffSection({ lang, serviceName }: { lang: Lang; serviceName: string 
               aria-pressed={activeTab === i}
               data-testid={`button-tariff-tab-${tab.id}`}
               className={`border p-5 text-left transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${
-                activeTab === i ? 'border-[hsl(270_70%_60%)] bg-[hsl(270_70%_60%_/_0.08)]' : 'border-[hsl(var(--border))]'
+                activeTab === i ? 'border-[hsl(150_50%_42%)] bg-[hsl(150_50%_42%_/_0.08)]' : 'border-[hsl(var(--border))]'
               }`}
             >
-              <span className="font-sans text-xs tracking-[0.2em] text-[hsl(270_70%_72%)]">0{i + 1}</span>
+              <span className="font-sans text-xs tracking-[0.2em] text-[hsl(150_45%_58%)]">0{i + 1}</span>
               <p className="mt-2 font-sans text-xl font-bold text-[hsl(var(--foreground))]">{tb.tabLabel}</p>
             </motion.button>
           );
@@ -1838,14 +1825,14 @@ function TariffSection({ lang, serviceName }: { lang: Lang; serviceName: string 
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               data-testid={`card-tariff-${tab.id}`}
-              className="mt-6 grid gap-10 border border-[hsl(var(--border))] p-8 transition-shadow duration-500 hover:shadow-[0_0_60px_-20px_hsl(270_70%_60%_/_0.5)] md:grid-cols-2 md:p-12"
+              className="mt-6 grid gap-10 border border-[hsl(var(--border))] p-8 transition-shadow duration-500 hover:shadow-[0_0_60px_-20px_hsl(150_50%_42%_/_0.5)] md:grid-cols-2 md:p-12"
             >
               <div>
                 <h3 className="font-sans text-4xl font-bold text-[hsl(var(--foreground))] md:text-5xl">{tb.name}</h3>
                 <p className="mt-3 max-w-xs font-serif text-lg italic leading-snug text-[hsl(var(--muted-foreground))]">
                   {tb.tagline}
                 </p>
-                <p className="mt-6 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(270_70%_72%)]">
+                <p className="mt-6 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(150_45%_58%)]">
                   {lang === 'uk' ? 'ТЕРМІН' : 'TIMELINE'}: {tb.term}
                 </p>
                 <motion.button
@@ -1857,7 +1844,7 @@ function TariffSection({ lang, serviceName }: { lang: Lang; serviceName: string 
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   data-testid="button-tariff-discuss"
-                  className="mt-8 inline-flex items-center gap-3 bg-[hsl(270_70%_60%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(270_70%_60%)]"
+                  className="mt-8 inline-flex items-center gap-3 bg-[hsl(150_50%_42%)] px-6 py-3 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(150_50%_42%)]"
                 >
                   {lang === 'uk' ? 'Обговорити проєкт' : 'Discuss the project'} →
                 </motion.button>
@@ -1865,7 +1852,7 @@ function TariffSection({ lang, serviceName }: { lang: Lang; serviceName: string 
               <ul className="space-y-3 self-center">
                 {tb.items.map((item) => (
                   <li key={item} className="flex gap-2.5 font-sans text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-                    <span className="mt-0.5 text-[hsl(270_70%_72%)]" aria-hidden>✓</span>
+                    <span className="mt-0.5 text-[hsl(150_45%_58%)]" aria-hidden>✓</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -1900,14 +1887,14 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
             width: '80%',
             maxWidth: 900,
             height: 420,
-            background: 'radial-gradient(ellipse 60% 55% at 35% 40%, rgba(124,92,255,0.28) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 70% 60%, rgba(90,72,255,0.2) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse 60% 55% at 35% 40%, rgba(56,150,110,0.28) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 70% 60%, rgba(46,130,95,0.2) 0%, transparent 70%)',
           }}
         />
         <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-4 font-sans text-xs uppercase tracking-[0.4em] text-[hsl(270_70%_72%)]"
+          className="mb-4 font-sans text-xs uppercase tracking-[0.4em] text-[hsl(150_45%_58%)]"
         >
           {lang === 'uk' ? 'Послуги' : 'Services'}
         </motion.p>
@@ -1956,20 +1943,20 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
               height: '100%',
               scaleY: smoothProgress,
               transformOrigin: 'top',
-              background: 'linear-gradient(to bottom, hsl(270 80% 72%), hsl(255 75% 58%))',
-              boxShadow: '0 0 12px 1px hsl(270 75% 68% / 0.45)',
+              background: 'linear-gradient(to bottom, hsl(150 55% 60%), hsl(160 50% 38%))',
+              boxShadow: '0 0 12px 1px hsl(150 48% 50% / 0.45)',
             }}
             aria-hidden
           />
           {/* Soft glow trailing the fill tip */}
           <motion.div
             className="pointer-events-none absolute left-1/2 hidden h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl md:block"
-            style={{ top: dotTop, background: 'radial-gradient(circle, hsl(270 75% 68% / 0.4) 0%, transparent 70%)' }}
+            style={{ top: dotTop, background: 'radial-gradient(circle, hsl(150 48% 50% / 0.4) 0%, transparent 70%)' }}
             aria-hidden
           />
           {/* Bulb at the current fill level */}
           <motion.div
-            className="pointer-events-none absolute left-1/2 hidden h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(270_80%_72%)] shadow-[0_0_18px_5px_hsl(270_75%_68%_/_0.65)] md:block"
+            className="pointer-events-none absolute left-1/2 hidden h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(150_55%_60%)] shadow-[0_0_18px_5px_hsl(150_48%_50%_/_0.65)] md:block"
             style={{ top: dotTop }}
             aria-hidden
           />
@@ -1990,7 +1977,7 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
                     onRight ? 'md:ml-auto md:text-left' : 'md:mr-auto md:text-right'
                   }`}
                 >
-                  <span className="font-sans text-xs tracking-[0.3em] text-[hsl(270_70%_72%)]">0{i + 1}</span>
+                  <span className="font-sans text-xs tracking-[0.3em] text-[hsl(150_45%_58%)]">0{i + 1}</span>
                   <p className={`mt-3 font-serif text-xl italic leading-snug text-[hsl(var(--muted-foreground))] ${onRight ? '' : 'md:ml-auto md:max-w-sm'}`}>
                     {s.short}
                   </p>
@@ -2003,7 +1990,7 @@ function ServicesPage({ t, lang, onNavigate }: { t: Copy; lang: Lang; onNavigate
                     onClick={() => onNavigate(svc.id as Page)}
                     whileHover={{ gap: '0.75rem' }}
                     data-testid={`button-service-more-${svc.id}`}
-                    className={`mt-5 inline-flex w-fit items-center gap-2 border-b border-[hsl(var(--foreground)_/_0.4)] pb-1 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(var(--foreground))] transition-colors hover:border-[hsl(270_70%_72%)] hover:text-[hsl(270_70%_72%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${onRight ? '' : 'md:ml-auto'}`}
+                    className={`mt-5 inline-flex w-fit items-center gap-2 border-b border-[hsl(var(--foreground)_/_0.4)] pb-1 font-sans text-xs uppercase tracking-[0.2em] text-[hsl(var(--foreground))] transition-colors hover:border-[hsl(150_45%_58%)] hover:text-[hsl(150_45%_58%)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[hsl(var(--primary))] ${onRight ? '' : 'md:ml-auto'}`}
                   >
                     {lang === 'uk' ? 'Детальніше' : 'Learn more'}
                     <span aria-hidden>→</span>
@@ -2094,13 +2081,7 @@ function ContactLinkRow({ href, label, sub, testId }: { href: string; label: str
 
 function ContactPage({ t, lang }: { t: Copy; lang: Lang }) {
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
-      <div
-        className="pointer-events-none absolute inset-0 -z-20 bg-cover bg-center opacity-[0.25] grayscale"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1651870364199-fc5f9f46ac85?q=80&w=1600&auto=format&fit=crop)' }}
-      />
-      <div className="pointer-events-none absolute inset-0 -z-20 bg-gradient-to-b from-[hsl(var(--background))] via-transparent to-[hsl(var(--background))]" />
-      <BlobArt className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[700px] w-[900px] -translate-x-1/2 opacity-50" />
+    <div className="min-h-[100dvh] w-full bg-[hsl(var(--background))]">
       <div className="mx-auto w-full max-w-6xl px-6 pt-28 pb-20 md:pt-36 md:pb-28">
         {/* Section label */}
         <motion.div
