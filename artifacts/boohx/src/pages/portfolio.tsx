@@ -4,7 +4,7 @@ import { motion, useSpring, useScroll, useTransform, useMotionTemplate, AnimateP
 import { useLocation } from 'wouter';
 import Lenis from 'lenis';
 
-const MiniGhost = lazy(() => import('@/components/MiniGhost'));
+import Hero3DObject from '@/components/Hero3DObject';
 const AmbientSparkles = lazy(() => import('@/components/AmbientSparkles'));
 const OrderWizard = lazy(() => import('@/components/OrderWizard'));
 
@@ -732,7 +732,7 @@ function HomePage({ t, lang, onViewWork, onNavigate }: { t: Copy; lang: Lang; on
   const letters = 'boohx'.split('');
 
   return (
-    <div className="relative flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6">
+    <div data-sculpture-region className="boohx-hero relative flex min-h-[100dvh] w-full flex-col items-center justify-center overflow-hidden px-6">
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <motion.div
@@ -744,20 +744,9 @@ function HomePage({ t, lang, onViewWork, onNavigate }: { t: Copy; lang: Lang; on
         <div className="noise-overlay absolute inset-0 opacity-[0.035]" />
       </div>
 
-      {/* Mini ghost — faceless, small, right side */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute right-[4%] top-[18%] z-0 md:right-[8%]"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div style={{ width: 'clamp(48px, 6vw, 88px)' }}>
-          <Suspense fallback={null}>
-            <MiniGhost />
-          </Suspense>
-        </div>
-      </motion.div>
+      <div className="boohx-hero-sculpture" aria-hidden="true">
+        <Hero3DObject />
+      </div>
 
       {/* Hero text */}
       <div className="relative z-10 flex flex-col items-center">
@@ -869,7 +858,7 @@ function HomePage({ t, lang, onViewWork, onNavigate }: { t: Copy; lang: Lang; on
         transition={{ duration: 0.8, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
         className="absolute bottom-8 right-8 z-10 hidden items-center gap-5 md:flex"
       >
-        <div className="text-right">
+        <div className="hidden text-right lg:block">
           <p className="font-sans text-[10px] uppercase tracking-[0.25em] text-[hsl(var(--muted-foreground))]">
             {lang === 'uk' ? 'Є ІДЕЯ ДЛЯ ПРОЄКТУ?' : 'HAVE A PROJECT IN MIND?'}
           </p>
@@ -1139,7 +1128,7 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
           {isUk ? 'ПОСЛУГА' : 'SERVICE'} / 0{index + 1}
         </p>
 
-        <div className="grid gap-12 md:grid-cols-[1fr_280px] md:gap-16">
+        <div data-sculpture-region className="grid gap-12 md:grid-cols-[1fr_280px] md:gap-16">
           <div>
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
@@ -1191,6 +1180,7 @@ function ServiceDetailPage({ svc, index, lang, onBack, onNavigate }: { svc: (typ
 
           {/* Stats column */}
           <div className="flex flex-col gap-8 md:border-l md:border-[hsl(var(--border))] md:pl-10">
+            {svc.id === 'frontend' && <Hero3DObject compact />}
             {s.stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -2218,6 +2208,7 @@ export default function Portfolio() {
   });
 
   const t = T[savedLang];
+  useEffect(() => { document.documentElement.lang = savedLang; }, [savedLang]);
 
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

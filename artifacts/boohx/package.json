@@ -73,6 +73,11 @@
     "vite": "catalog:",
     "lenis": "^1.1.18",
     "wouter": "^3.3.5",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@types/three": "0.185.0"
+  },
+  "dependencies": {
+    "three": "0.185.1",
+    "@react-three/fiber": "9.7.0"
   }
 }
